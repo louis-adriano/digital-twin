@@ -25,25 +25,50 @@ export async function POST(request: NextRequest) {
       data: message,
       topK: 3,
       includeMetadata: true,
+      includeData: true,  // Explicitly request the data field
     });
 
     console.log('Search results:', searchResults.length, 'found');
     searchResults.forEach((result, i) => {
       console.log(`Result ${i + 1}: score=${result.score}`);
-      console.log(`Metadata keys:`, Object.keys(result.metadata || {}));
-      console.log(`Full metadata:`, result.metadata);
+      console.log(`Metadata:`, result.metadata);
+      console.log(`Data:`, result.data);
     });
 
-    // Extract relevant context from search results - let's check all metadata fields
+    // Extract relevant context from search results - use the data field which contains the actual text
     const context = searchResults
       .filter(result => result.score > 0.6)
       .map(result => {
-        const metadata = result.metadata || {};
-        // Try different possible field names for the text content
-        const text = metadata.text || metadata.content || metadata.description || metadata.name || 'No content found';
-        return text as string;
+        // Try to get the actual content from data field first
+        let content = result.data as string;
+        
+        // If data field is undefined, construct content from metadata
+        if (!content) {
+          const metadata = result.metadata || {};
+          if (metadata.type === 'skill') {
+            const skillName = metadata.name || metadata.skill_name;
+            const proficiency = metadata.proficiency_level;
+            const experience = metadata.years_experience;
+            const category = metadata.category;
+            
+            content = `**${skillName}** (${category}) - ${proficiency} level`;
+            if (experience) {
+              content += ` with ${experience} year${experience !== 1 ? 's' : ''} of experience`;
+            }
+          } else if (metadata.type === 'experience') {
+            content = `**${metadata.position}** at **${metadata.company}**`;
+          } else if (metadata.type === 'project') {
+            content = `**Project: ${metadata.name}** - Status: ${metadata.status}`;
+          } else if (metadata.type === 'education') {
+            content = `**${metadata.degree}** in ${metadata.field_of_study} from **${metadata.institution}**`;
+          } else if (metadata.type === 'content') {
+            content = `**${metadata.title}**`;
+          }
+        }
+        
+        return content;
       })
-      .filter(text => text && text !== 'No content found')
+      .filter(text => text && text.trim())
       .join('\n\n');
 
     let response = '';
@@ -51,22 +76,7 @@ export async function POST(request: NextRequest) {
     if (context.trim()) {
       response = `Based on my professional background:\n\n${context}`;
     } else {
-      // If no matches above 0.6, show the best results with all available metadata
-      const bestResults = searchResults
-        .slice(0, 2)
-        .map(result => {
-          const metadata = result.metadata || {};
-          console.log('Fallback metadata check:', metadata);
-          return JSON.stringify(metadata, null, 2);
-        })
-        .filter(text => text.trim())
-        .join('\n\n');
-      
-      if (bestResults) {
-        response = `Here's what I found:\n\n${bestResults}`;
-      } else {
-        response = "I don't have specific information about that topic. Try asking about my programming skills, work experience, or projects!";
-      }
+      response = "I don't have specific information about that topic. Try asking about my programming skills, work experience, or projects!";
     }
 
     console.log('Sending response:', response.substring(0, 100) + '...');
@@ -75,7 +85,7 @@ export async function POST(request: NextRequest) {
       response,
       searchResults: searchResults.map(r => ({
         score: r.score,
-        preview: (r.metadata?.text as string)?.substring(0, 100) + '...' || 'No preview available'
+        preview: (r.data as string)?.substring(0, 100) + '...' || 'No preview available'
       }))
     });
   } catch (error) {
