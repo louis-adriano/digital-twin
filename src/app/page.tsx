@@ -262,17 +262,12 @@ export default function Home() {
             {activeSection === 'skills' && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-gray-900">Skills</h2>
-                {profileData?.skills.reduce((acc, skill) => {
-                  if (!acc[skill.category]) acc[skill.category] = [];
-                  acc[skill.category].push(skill);
-                  return acc;
-                }, {} as Record<string, typeof profileData.skills>).entries && 
-                Object.entries(
-                  profileData?.skills.reduce((acc, skill) => {
+                {profileData?.skills && Object.entries(
+                  profileData.skills.reduce((acc, skill) => {
                     if (!acc[skill.category]) acc[skill.category] = [];
                     acc[skill.category].push(skill);
                     return acc;
-                  }, {} as Record<string, typeof profileData.skills>) || {}
+                  }, {} as Record<string, typeof profileData.skills>)
                 ).map(([category, skills]) => (
                   <div key={category} className="bg-white rounded-lg shadow p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">{category}</h3>
