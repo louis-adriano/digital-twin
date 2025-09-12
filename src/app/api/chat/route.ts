@@ -1,95 +1,211 @@
+import { config } from 'dotenv';
+
+// Add this at the top
+config({ path: '.env.local' });
+
 import { NextRequest, NextResponse } from 'next/server';
 import { Index } from '@upstash/vector';
+import Groq from 'groq-sdk';
+
+// Simple in-memory rate limiting (use Redis for production)
+const RATE_LIMIT = new Map();
 
 const index = new Index({
   url: process.env.UPSTASH_VECTOR_REST_URL!,
   token: process.env.UPSTASH_VECTOR_REST_TOKEN!,
 });
 
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY!,
+});
+
 export async function POST(request: NextRequest) {
   try {
-    const { message } = await request.json();
+    // Rate limiting
+    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const now = Date.now();
+    const windowMs = 60 * 1000; // 1 minute
+    const maxRequests = 10;
 
-    console.log('Received message:', message);
+    if (!RATE_LIMIT.has(ip)) {
+      RATE_LIMIT.set(ip, []);
+    }
 
-    if (!message || typeof message !== 'string') {
+    const requests = RATE_LIMIT.get(ip);
+    const validRequests = requests.filter((time: number) => now - time < windowMs);
+    
+    if (validRequests.length >= maxRequests) {
       return NextResponse.json(
-        { error: 'Message is required' },
+        { error: 'Too many requests. Please wait a minute.' },
+        { status: 429 }
+      );
+    }
+
+    validRequests.push(now);
+    RATE_LIMIT.set(ip, validRequests);
+
+    // Input validation
+    const body = await request.json();
+    
+    if (!body.message || typeof body.message !== 'string') {
+      return NextResponse.json(
+        { error: 'Message is required and must be a string' },
         { status: 400 }
       );
     }
 
-    // Search vector database for relevant information
-    console.log('Searching vector database...');
+    if (body.message.length > 1000) {
+      return NextResponse.json(
+        { error: 'Message too long (max 1000 characters)' },
+        { status: 400 }
+      );
+    }
+
+    const message = body.message.trim();
+
+    console.log('🔍 User inquiry:', message);
+
+    // STEP 1: AI translates user inquiry into better vector search query
+    console.log('🧠 Step 1: Translating user query for vector search...');
+    const searchQueryCompletion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: `You are a query optimizer for a professional portfolio vector database. Transform user questions into clear, specific search terms that will find relevant professional information.
+
+Examples:
+- "What do you know?" → "skills experience projects education background"
+- "Tell me about your work" → "work experience professional jobs companies"
+- "What projects?" → "projects applications software development"
+- "Your skills?" → "programming skills technologies languages frameworks"
+- "AI experience?" → "artificial intelligence machine learning AI projects"
+
+Transform the user's question into 3-5 key search terms that will find the most relevant professional information. Return only the search terms.`
+        },
+        {
+          role: 'user',
+          content: message
+        }
+      ],
+      model: 'llama-3.1-8b-instant', // Updated to available model
+      temperature: 0.3,
+      max_tokens: 50,
+      stream: false,
+    });
+
+    const optimizedQuery = searchQueryCompletion.choices[0]?.message?.content || message;
+    console.log('🎯 Optimized search query:', optimizedQuery);
+
+    // STEP 2: Search vector database with optimized query
+    console.log('📊 Step 2: Searching vector database...');
     const searchResults = await index.query({
-      data: message,
-      topK: 3,
+      data: optimizedQuery,
+      topK: 5,
       includeMetadata: true,
-      includeData: true,  // Explicitly request the data field
+      includeData: true,
     });
 
-    console.log('Search results:', searchResults.length, 'found');
-    searchResults.forEach((result, i) => {
-      console.log(`Result ${i + 1}: score=${result.score}`);
-      console.log(`Metadata:`, result.metadata);
-      console.log(`Data:`, result.data);
-    });
+    console.log(`📋 Found ${searchResults.length} relevant matches`);
 
-    // Extract relevant context from search results - use the data field which contains the actual text
+    // STEP 3: Extract relevant context from search results
     const context = searchResults
       .filter(result => result.score > 0.6)
       .map(result => {
-        // Try to get the actual content from data field first
-        let content = result.data as string;
-        
-        // If data field is undefined, construct content from metadata
-        if (!content) {
-          const metadata = result.metadata || {};
-          if (metadata.type === 'skill') {
-            const skillName = metadata.name || metadata.skill_name;
-            const proficiency = metadata.proficiency_level;
-            const experience = metadata.years_experience;
-            const category = metadata.category;
-            
-            content = `**${skillName}** (${category}) - ${proficiency} level`;
-            if (experience) {
-              content += ` with ${experience} year${experience !== 1 ? 's' : ''} of experience`;
-            }
-          } else if (metadata.type === 'experience') {
-            content = `**${metadata.position}** at **${metadata.company}**`;
-          } else if (metadata.type === 'project') {
-            content = `**Project: ${metadata.name}** - Status: ${metadata.status}`;
-          } else if (metadata.type === 'education') {
-            content = `**${metadata.degree}** in ${metadata.field_of_study} from **${metadata.institution}**`;
-          } else if (metadata.type === 'content') {
-            content = `**${metadata.title}**`;
-          }
+        // Always prefer the data field which contains the actual content
+        if (result.data && typeof result.data === 'string') {
+          return result.data;
         }
         
-        return content;
+        // Only fall back to metadata if data is missing
+        const metadata = result.metadata || {};
+        switch (metadata.type) {
+          case 'skill':
+            return `${metadata.name} (${metadata.category}) - Level ${metadata.proficiency_level}/5`;
+          case 'experience':
+            return `${metadata.position} at ${metadata.company}`;
+          case 'project':
+            return `Project: ${metadata.name} (${metadata.status})`;
+          case 'education':
+            return `${metadata.degree} in ${metadata.field_of_study} from ${metadata.institution}`;
+          case 'content':
+            return metadata.title || 'Content chunk';
+          default:
+            return null;
+        }
       })
-      .filter(text => text && text.trim())
+      .filter(Boolean)
       .join('\n\n');
 
-    let response = '';
+    console.log('📝 Step 3: Context prepared for AI');
+
+    // STEP 4: AI interprets data and responds in human talk
+    console.log('🤖 Step 4: AI generating conversational response...');
     
-    if (context.trim()) {
-      response = `Based on my professional background:\n\n${context}`;
-    } else {
-      response = "I don't have specific information about that topic. Try asking about my programming skills, work experience, or projects!";
-    }
+    const stream = await groq.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: `You are Louis Adriano, a full-stack developer. Respond naturally and conversationally in first person as if you're Louis himself talking to someone.
 
-    console.log('Sending response:', response.substring(0, 100) + '...');
+Guidelines:
+- Always respond in first person ("I", "my", "me")
+- Be conversational and friendly, but professional
+- Use the context to give specific, detailed answers
+- Don't mention AI, context, or data - just speak naturally
+- If multiple topics are in context, organize your response clearly
+- Keep responses engaging and informative
 
-    return NextResponse.json({
-      response,
-      searchResults: searchResults.map(r => ({
-        score: r.score,
-        preview: (r.data as string)?.substring(0, 100) + '...' || 'No preview available'
-      }))
+Context about your professional background:
+${context}`
+        },
+        {
+          role: 'user',
+          content: message
+        }
+      ],
+      model: 'llama-3.1-8b-instant',
+      temperature: 0.7,
+      max_tokens: 400,
+      stream: true, // Enable streaming for real-time response
     });
+
+    // Create streaming response
+    const encoder = new TextEncoder();
+    const readable = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of stream) {
+            const content = chunk.choices[0]?.delta?.content || '';
+            if (content) {
+              const data = `data: ${JSON.stringify({ content })}\n\n`;
+              controller.enqueue(encoder.encode(data));
+            }
+          }
+          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+          controller.close();
+        } catch (error) {
+          console.error('Streaming error:', error);
+          controller.error(error);
+        }
+      },
+    });
+
+    return new Response(readable, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    });
+
   } catch (error) {
-    console.error('Chat error:', error);
+    console.error('❌ Chat error:', error);
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: 'Failed to process chat message' },
       { status: 500 }

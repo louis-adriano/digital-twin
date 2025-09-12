@@ -1,0 +1,41 @@
+{
+  "name": "digital-twin-mcp-server",
+  "version": "1.0.0",
+  "description": "Model Context Protocol server for Digital Twin professional data access",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts",
+    "dev": "tsx --watch index.ts",
+    "test": "tsx test-client.ts",
+    "build": "tsx build.ts",
+    "lint": "eslint *.ts tools/*.ts"
+  },
+  "bin": {
+    "digital-twin-mcp": "./index.ts"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "professional-data",
+    "digital-twin",
+    "claude-desktop"
+  ],
+  "author": "Digital Twin MCP Server",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.18.0",
+    "@upstash/vector": "^1.2.2",
+    "dotenv": "^17.2.2",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.13",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.20.5",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

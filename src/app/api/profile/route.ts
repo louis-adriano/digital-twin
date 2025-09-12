@@ -1,3 +1,8 @@
+import { config } from 'dotenv';
+
+// Add this at the top
+config({ path: '.env.local' });
+
 import { NextResponse } from 'next/server';
 import { Client } from 'pg';
 
@@ -9,10 +14,18 @@ export async function GET() {
   try {
     await client.connect();
     
-    // Get profile
+    // Check if we have any data first
     const profileResult = await client.query('SELECT * FROM professionals LIMIT 1');
+    
+    if (profileResult.rows.length === 0) {
+      return NextResponse.json(
+        { error: 'No profile data found. Run setup scripts first.' },
+        { status: 404 }
+      );
+    }
+    
     const profile = profileResult.rows[0];
-
+    
     // Get experiences
     const experiencesResult = await client.query(
       'SELECT * FROM experiences WHERE professional_id = $1 ORDER BY start_date DESC',
@@ -80,7 +93,10 @@ export async function GET() {
   } catch (error) {
     console.error('Database error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch profile data' },
+      { 
+        error: 'Failed to fetch profile data',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   } finally {

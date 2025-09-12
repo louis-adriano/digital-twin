@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "digital-twin-professional": {
+      "command": "node",
+      "args": [
+        "/path/to/your/digital-twin/mcp-server/dist/index.js"
+      ],
+      "env": {
+        "DATABASE_URL": "your_postgresql_connection_string",
+        "UPSTASH_VECTOR_REST_URL": "your_upstash_vector_url",
+        "UPSTASH_VECTOR_REST_TOKEN": "your_upstash_vector_token"
+      }
+    }
+  }
+}

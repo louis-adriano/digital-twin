@@ -1,11 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
+import ChatBot from '../components/ChatBot';
 
 interface ProfileData {
   profile: {
@@ -56,24 +52,26 @@ interface ProfileData {
 }
 
 export default function Home() {
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [chatLoading, setChatLoading] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('overview');
+  const [error, setError] = useState<string | null>(null);
 
   // Load profile data
   useEffect(() => {
     const loadProfile = async () => {
       try {
+        setError(null);
         const response = await fetch('/api/profile');
-        if (response.ok) {
-          const data = await response.json();
-          setProfileData(data);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Failed to load profile: ${response.status}`);
         }
+        const data = await response.json();
+        setProfileData(data);
       } catch (error) {
         console.error('Failed to load profile:', error);
+        setError(error instanceof Error ? error.message : 'Failed to load profile');
       } finally {
         setProfileLoading(false);
       }
@@ -82,40 +80,23 @@ export default function Home() {
     loadProfile();
   }, []);
 
-  // Handle chat submission
-  const handleChatSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputMessage.trim() || chatLoading) return;
-
-    const userMessage: ChatMessage = { role: 'user', content: inputMessage };
-    setChatMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
-    setChatLoading(true);
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: inputMessage }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get chat response');
-      }
-
-      const data = await response.json();
-      const assistantMessage: ChatMessage = { role: 'assistant', content: data.response };
-      setChatMessages(prev => [...prev, assistantMessage]);
-    } catch (err) {
-      const errorMessage: ChatMessage = { 
-        role: 'assistant', 
-        content: 'Sorry, I encountered an error. Please try again.' 
-      };
-      setChatMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setChatLoading(false);
-    }
-  };
+  // Add error display before your existing loading check:
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-xl text-red-600 mb-4">Error Loading Profile</div>
+          <div className="text-gray-600 mb-4">{error}</div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Format date helper
   const formatDate = (dateString: string | null) => {
@@ -136,8 +117,18 @@ export default function Home() {
 
   if (profileLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading digital twin...</div>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-300 rounded w-1/4 mb-4"></div>
+            <div className="h-4 bg-gray-300 rounded w-1/2 mb-8"></div>
+            <div className="space-y-4">
+              <div className="h-32 bg-gray-300 rounded"></div>
+              <div className="h-32 bg-gray-300 rounded"></div>
+              <div className="h-32 bg-gray-300 rounded"></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -338,66 +329,7 @@ export default function Home() {
 
           {/* Chat Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow h-[600px] flex flex-col">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">Ask My Digital Twin</h3>
-                <p className="text-sm text-gray-600">Chat with AI about my background</p>
-              </div>
-              
-              {/* Chat Messages */}
-              <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
-                {chatMessages.length === 0 ? (
-                  <div className="text-center text-gray-500 mt-8">
-                    <p className="mb-2">👋 Hello!</p>
-                    <p className="text-sm">Ask me about my experience, skills, or projects!</p>
-                  </div>
-                ) : (
-                  chatMessages.map((msg, index) => (
-                    <div key={index} className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                      <div className={`inline-block max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        msg.role === 'user' 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-white text-gray-900 shadow-sm border'
-                      }`}>
-                        <div className="text-xs font-semibold mb-1 opacity-75">
-                          {msg.role === 'user' ? 'You' : 'Digital Twin'}
-                        </div>
-                        <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
-                      </div>
-                    </div>
-                  ))
-                )}
-                {chatLoading && (
-                  <div className="text-left mb-4">
-                    <div className="inline-block max-w-xs lg:max-w-md px-4 py-2 rounded-lg bg-white text-gray-900 shadow-sm border">
-                      <div className="text-xs font-semibold mb-1 opacity-75">Digital Twin</div>
-                      <div className="text-sm">Thinking...</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Chat Input */}
-              <form onSubmit={handleChatSubmit} className="p-4 border-t border-gray-200">
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Ask about my background..."
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    disabled={chatLoading}
-                  />
-                  <button 
-                    type="submit" 
-                    disabled={chatLoading || !inputMessage.trim()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Send
-                  </button>
-                </div>
-              </form>
-            </div>
+            <ChatBot />
           </div>
         </div>
       </div>

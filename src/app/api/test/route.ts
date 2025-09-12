@@ -1,3 +1,8 @@
+import { config } from 'dotenv';
+
+// Add this at the top
+config({ path: '.env.local' });
+
 import { NextResponse } from 'next/server';
 
 export async function GET() {
