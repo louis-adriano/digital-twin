@@ -261,12 +261,12 @@ export const handleGetCompleteProfile = async (args: any): Promise<CallToolResul
           completeProfile += `### ${project.name}\n`;
           
           if (project.status) {
-            const statusIcon = {
+            const statusIcon = ({
               'completed': '✅',
               'in-progress': '🔄',
               'on-hold': '⏸️',
               'planning': '📋'
-            }[project.status] || '📝';
+            } as Record<string, string>)[project.status] || '📝';
             completeProfile += `${statusIcon} Status: ${project.status.charAt(0).toUpperCase() + project.status.slice(1).replace('-', ' ')}\n`;
           }
 

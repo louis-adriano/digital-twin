@@ -415,7 +415,7 @@ export default function ProjectsManager() {
                     <h4 className="text-xl font-semibold text-gray-900">{project.name}</h4>
                     <div className="flex items-center mt-2 space-x-3">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status || 'completed')}`}>
-                        {project.status?.charAt(0).toUpperCase() + project.status?.slice(1).replace('-', ' ')}
+                        {project.status ? project.status.charAt(0).toUpperCase() + project.status.slice(1).replace('-', ' ') : 'Completed'}
                       </span>
                       {project.start_date && (
                         <span className="text-sm text-gray-500">

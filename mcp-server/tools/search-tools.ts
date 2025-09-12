@@ -427,13 +427,13 @@ export const handleSearchProjects = async (args: any): Promise<CallToolResult> =
       let details = `**${project.name}**\n`;
       
       if (project.status) {
-        const statusIcon = {
+        const statusIcon = ({
           'completed': '✅',
           'in-progress': '🔄',
           'on-hold': '⏸️',
           'planning': '📋',
           'cancelled': '❌'
-        }[project.status] || '📝';
+        } as Record<string, string>)[project.status] || '📝';
         details += `${statusIcon} Status: ${project.status.charAt(0).toUpperCase() + project.status.slice(1).replace('-', ' ')}\n`;
       }
 
