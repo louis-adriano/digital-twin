@@ -57,37 +57,37 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Admin Dashboard
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to access the admin panel
+        <div className="text-center">
+          <h1 className="font-serif text-4xl font-bold text-foreground mb-2">
+            Admin Access
+          </h1>
+          <p className="text-muted-foreground font-sans font-light">
+            Enter your credentials to access the digital twin admin panel
           </p>
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <label htmlFor="password" className="sr-only">
-              Password
+            <label htmlFor="password" className="block text-sm font-sans font-medium text-foreground mb-2">
+              Administrator Password
             </label>
             <input
               {...register('password')}
               type="password"
               placeholder="Enter admin password"
-              className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              className="w-full px-4 py-3 border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent font-sans"
               disabled={isLoading}
             />
             {errors.password && (
-              <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              <p className="mt-2 text-sm text-destructive font-sans">{errors.password.message}</p>
             )}
           </div>
 
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <p className="text-sm text-red-800">{error}</p>
+            <div className="bg-card border border-destructive/20 p-4">
+              <p className="text-sm text-destructive font-sans">{error}</p>
             </div>
           )}
 
@@ -95,10 +95,19 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-foreground text-background hover:bg-secondary py-3 px-4 font-sans font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? 'Signing in...' : 'Access Admin Panel'}
             </button>
+          </div>
+          
+          <div className="text-center">
+            <a
+              href="/"
+              className="text-sm font-sans text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ← Return to Portfolio
+            </a>
           </div>
         </form>
       </div>

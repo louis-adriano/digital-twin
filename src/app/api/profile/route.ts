@@ -54,6 +54,7 @@ export async function GET() {
       profile: {
         name: profile.name,
         email: profile.email,
+        title: profile.title,  // ✅ Make sure title is included
         location: profile.location,
         bio: profile.summary,
         linkedin_url: profile.linkedin_url,

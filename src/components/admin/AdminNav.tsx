@@ -38,27 +38,27 @@ export default function AdminNav() {
   };
 
   return (
-    <nav className="bg-gray-800 shadow-lg">
+    <nav className="bg-background border-b border-border shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-8">
             <Link href="/admin/dashboard" className="flex-shrink-0">
-              <h1 className="text-white text-lg font-semibold">
+              <h1 className="text-foreground text-lg font-serif font-semibold">
                 Digital Twin Admin
               </h1>
             </Link>
             
-            <div className="hidden md:flex space-x-4">
+            <div className="hidden md:flex space-x-8">
               {navigation.map((item) => {
                 const isActive = pathname === item.href;
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    className={`px-3 py-2 text-sm font-sans transition-colors border-b-2 ${
                       isActive
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                        ? 'text-foreground border-foreground font-medium'
+                        : 'text-muted-foreground border-transparent hover:text-foreground hover:border-muted'
                     }`}
                   >
                     <span className="mr-2">{item.icon}</span>
@@ -73,14 +73,14 @@ export default function AdminNav() {
             <Link
               href="/"
               target="_blank"
-              className="text-gray-300 hover:text-white text-sm"
+              className="text-muted-foreground hover:text-foreground text-sm font-sans transition-colors"
             >
               View Site
             </Link>
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium disabled:opacity-50"
+              className="bg-foreground text-background hover:bg-secondary px-4 py-2 text-sm font-sans font-medium disabled:opacity-50 transition-colors"
             >
               {isLoggingOut ? 'Logging out...' : 'Logout'}
             </button>
@@ -88,7 +88,7 @@ export default function AdminNav() {
         </div>
         
         {/* Mobile menu */}
-        <div className="md:hidden">
+        <div className="md:hidden border-t border-border">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navigation.map((item) => {
               const isActive = pathname === item.href;
@@ -96,10 +96,10 @@ export default function AdminNav() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  className={`block px-3 py-2 text-base font-sans transition-colors ${
                     isActive
-                      ? 'bg-gray-900 text-white'
-                      : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                      ? 'text-foreground font-medium border-l-2 border-foreground pl-4'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <span className="mr-2">{item.icon}</span>
