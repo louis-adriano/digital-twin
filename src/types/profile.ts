@@ -10,6 +10,7 @@ export interface ProfileData {
     linkedin_url?: string;
     github_url?: string;
     website_url?: string;
+    cv_filename?: string;
   };
   experiences: Array<{
     id: number;

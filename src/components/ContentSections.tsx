@@ -169,34 +169,31 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
                 {} as Record<string, typeof profileData.skills>,
               ),
             ).map(([category, skills]) => (
-              <div key={category} className="pb-8 border-b border-border last:border-b-0">
-                <h3 className="font-serif text-xl font-bold text-foreground mb-6">
-                  {category}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {skills.map((skill) => (
-                    <div key={skill.id} className="space-y-2">
-                      <div className="flex justify-between items-baseline">
-                        <span className="font-medium text-foreground font-sans">
-                          {skill.name}
-                        </span>
-                        <span className="text-xs text-muted-foreground font-sans">
-                          {skill.years_experience}y
-                        </span>
-                      </div>
-                      <div className="w-full bg-muted h-0.5">
+              <div key={category} className="pb-12 border-b border-border last:border-b-0">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+                  {/* Category Header */}
+                  <div className="lg:col-span-1">
+                    <h3 className="font-serif text-xl font-bold text-foreground mb-4 uppercase tracking-wider">
+                      {category}
+                    </h3>
+                    <div className="w-8 h-px bg-foreground"></div>
+                  </div>
+                  
+                  {/* Skills List */}
+                  <div className="lg:col-span-4">
+                    <div className="space-y-6">
+                      {skills.map((skill) => (
                         <div
-                          className="h-0.5 bg-foreground"
-                          style={{
-                            width: `${(skill.proficiency_level / 5) * 100}%`,
-                          }}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground font-sans">
-                        Level {skill.proficiency_level}/5
-                      </span>
+                          key={skill.id}
+                          className="group flex items-center py-3 border-b border-border/30 hover:border-foreground transition-all duration-300"
+                        >
+                          <span className="font-sans text-lg text-foreground group-hover:font-medium transition-all duration-300">
+                            {skill.name}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
               </div>
             ))}

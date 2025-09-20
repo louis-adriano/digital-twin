@@ -23,6 +23,9 @@ export default function ProfileEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [currentCvFilename, setCurrentCvFilename] = useState<string | null>(null);
+  const [cvUploading, setCvUploading] = useState(false);
 
   const {
     register,
@@ -51,6 +54,7 @@ export default function ProfileEditor() {
         github_url: profile.github_url || '',
         website_url: profile.website_url || '',
       });
+      setCurrentCvFilename(profile.cv_filename || null);
     } catch (error) {
       setMessage({
         type: 'error',
@@ -91,6 +95,92 @@ export default function ProfileEditor() {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleCvUpload = async () => {
+    if (!cvFile) return;
+
+    try {
+      setCvUploading(true);
+      setMessage(null);
+
+      const formData = new FormData();
+      formData.append('cv', cvFile);
+
+      const response = await fetch('/api/admin/cv', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to upload CV');
+      }
+
+      setCurrentCvFilename(result.filename);
+      setCvFile(null);
+      setMessage({ type: 'success', text: 'CV uploaded successfully!' });
+    } catch (error) {
+      setMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to upload CV',
+      });
+    } finally {
+      setCvUploading(false);
+    }
+  };
+
+  const handleCvRemove = async () => {
+    try {
+      setCvUploading(true);
+      setMessage(null);
+
+      const response = await fetch('/api/admin/cv', {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to remove CV');
+      }
+
+      setCurrentCvFilename(null);
+      setMessage({ type: 'success', text: 'CV removed successfully!' });
+    } catch (error) {
+      setMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to remove CV',
+      });
+    } finally {
+      setCvUploading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = [
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ];
+      if (!allowedTypes.includes(file.type)) {
+        setMessage({ type: 'error', text: 'Only PDF and DOCX files are allowed' });
+        return;
+      }
+
+      // Validate file size (5MB max)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        setMessage({ type: 'error', text: 'File size must be less than 5MB' });
+        return;
+      }
+
+      setCvFile(file);
+      setMessage(null);
     }
   };
 
@@ -253,6 +343,79 @@ export default function ProfileEditor() {
             )}
             <p className="mt-1 text-xs text-muted-foreground font-sans">For admin records only, not currently displayed on website</p>
           </div>
+        </div>
+
+        {/* CV Upload Section */}
+        <div className="border-t border-border pt-6">
+          <div className="mb-4">
+            <h3 className="text-lg font-serif font-semibold text-foreground mb-2">CV/Resume</h3>
+            <p className="text-sm text-muted-foreground font-sans">Upload your CV as a PDF or DOCX file. This will add a download button on your homepage.</p>
+          </div>
+
+          {currentCvFilename ? (
+            <div className="space-y-4">
+              <div className="p-4 bg-card border border-border rounded">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-foreground/10 rounded flex items-center justify-center">
+                      <span className="text-xs font-mono">
+                        {currentCvFilename?.endsWith('.docx') ? 'DOCX' : 'PDF'}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">CV uploaded</p>
+                      <p className="text-xs text-muted-foreground">{currentCvFilename}</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCvRemove}
+                    disabled={cvUploading}
+                    className="px-3 py-1 text-xs bg-destructive text-destructive-foreground hover:bg-destructive/80 transition-colors disabled:opacity-50"
+                  >
+                    {cvUploading ? 'Removing...' : 'Remove'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <input
+                  type="file"
+                  accept=".pdf,.docx"
+                  onChange={handleFileChange}
+                  className="block w-full text-sm text-muted-foreground
+                    file:mr-4 file:py-2 file:px-4
+                    file:border-0 file:text-sm file:font-medium
+                    file:bg-foreground file:text-background
+                    hover:file:bg-secondary file:transition-colors"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">PDF and DOCX files only, max 5MB</p>
+              </div>
+
+              {cvFile && (
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 bg-foreground/10 rounded flex items-center justify-center">
+                      <span className="text-xs font-mono">
+                        {cvFile.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ? 'DOCX' : 'PDF'}
+                      </span>
+                    </div>
+                    <span className="text-sm text-foreground">{cvFile.name}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCvUpload}
+                    disabled={cvUploading}
+                    className="px-4 py-2 bg-foreground text-background hover:bg-secondary disabled:bg-muted disabled:cursor-not-allowed transition-colors font-sans text-sm"
+                  >
+                    {cvUploading ? 'Uploading...' : 'Upload CV'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end space-x-4">

@@ -200,6 +200,16 @@ export default function Home() {
                       GitHub
                     </a>
                   )}
+                  {profileData?.profile.cv_filename && (
+                    <a
+                      href="/api/cv/download"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-foreground hover:text-muted-foreground transition-colors text-sm uppercase tracking-wide font-sans"
+                    >
+                      Download CV
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

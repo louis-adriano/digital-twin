@@ -60,6 +60,7 @@ export async function GET() {
         linkedin_url: profile.linkedin_url,
         github_url: profile.github_url,
         website_url: profile.website_url,
+        cv_filename: profile.cv_filename,
       },
       experiences: experiencesResult.rows.map(exp => ({
         id: exp.id,
