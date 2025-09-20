@@ -346,7 +346,7 @@ export default function ExperienceManager() {
         {experiences.length === 0 ? (
           <div className="bg-gray-50 rounded-lg p-8 text-center">
             <p className="text-gray-500">No experiences added yet.</p>
-            <p className="text-sm text-gray-400 mt-1">Click "Add New Experience" to get started!</p>
+            <p className="text-sm text-gray-400 mt-1">Click &quot;Add New Experience&quot; to get started!</p>
           </div>
         ) : (
           <div className="space-y-4">

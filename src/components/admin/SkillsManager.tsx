@@ -352,7 +352,7 @@ export default function SkillsManager() {
         {skills.length === 0 ? (
           <div className="bg-gray-50 rounded-lg p-8 text-center">
             <p className="text-gray-500">No skills added yet.</p>
-            <p className="text-sm text-gray-400 mt-1">Click "Add New Skill" to get started!</p>
+            <p className="text-sm text-gray-400 mt-1">Click &quot;Add New Skill&quot; to get started!</p>
           </div>
         ) : (
           <div className="space-y-6">

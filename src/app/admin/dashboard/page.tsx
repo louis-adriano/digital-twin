@@ -57,7 +57,7 @@ export default function AdminDashboard() {
   const handleQuickAction = async (action: string) => {
     try {
       let endpoint = '';
-      let method = 'POST';
+      const method = 'POST';
       let body = {};
 
       switch (action) {

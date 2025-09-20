@@ -12,7 +12,7 @@ interface EmbeddingsInfo {
 interface SearchResult {
   id: string;
   score: number;
-  metadata: any;
+  metadata: Record<string, unknown>;
   data: string;
 }
 
@@ -242,7 +242,7 @@ export default function EmbeddingsManagementPage() {
 
         {searchQuery && searchResults.length === 0 && !searching && (
           <div className="text-center py-8">
-            <p className="text-gray-500">No results found for "{searchQuery}"</p>
+            <p className="text-gray-500">No results found for &quot;{searchQuery}&quot;</p>
           </div>
         )}
       </div>

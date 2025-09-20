@@ -41,7 +41,7 @@ export default function FloatingChat() {
     if (isChatOpen && chatMessages.length > 0) {
       setTimeout(scrollToBottom, 200);
     }
-  }, [isChatOpen]);
+  }, [isChatOpen, chatMessages.length]);
 
   const sendMessage = async (message: string) => {
     if (!message.trim()) return;
@@ -120,7 +120,7 @@ export default function FloatingChat() {
                     )
                   );
                 }
-              } catch (e) {
+              } catch {
                 // Skip malformed JSON
               }
             }
@@ -193,7 +193,7 @@ export default function FloatingChat() {
                     <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl">👋</span>
                     </div>
-                    <h4 className="font-serif text-xl text-foreground mb-2">Hello! I'm Louis's Digital Twin</h4>
+                    <h4 className="font-serif text-xl text-foreground mb-2">Hello! I&apos;m Louis&apos;s Digital Twin</h4>
                     <p className="text-muted-foreground font-sans">Ask me anything about my experience, skills, or projects!</p>
                   </div>
                   

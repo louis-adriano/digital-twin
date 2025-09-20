@@ -122,7 +122,7 @@ export default function ChatBot() {
                     )
                   );
                 }
-              } catch (e) {
+              } catch {
                 // Skip malformed JSON
               }
             }

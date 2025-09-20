@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { testGetAction, testPostAction } from '../app/actions/test-actions';
 
 export default function TestServerActions() {
-  const [getResult, setGetResult] = useState<any>(null);
-  const [postResult, setPostResult] = useState<any>(null);
+  const [getResult, setGetResult] = useState<unknown>(null);
+  const [postResult, setPostResult] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
 
   const handleTestGet = async () => {
@@ -47,11 +47,11 @@ export default function TestServerActions() {
           {loading ? 'Loading...' : 'Test GET Action'}
         </button>
         
-        {getResult && (
+        {getResult ? (
           <div className="p-2 bg-gray-100 rounded">
             <pre>{JSON.stringify(getResult, null, 2)}</pre>
           </div>
-        )}
+        ) : null}
       </div>
 
       <div className="space-y-2">
@@ -63,11 +63,11 @@ export default function TestServerActions() {
           {loading ? 'Loading...' : 'Test POST Action'}
         </button>
         
-        {postResult && (
+        {postResult ? (
           <div className="p-2 bg-gray-100 rounded">
             <pre>{JSON.stringify(postResult, null, 2)}</pre>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

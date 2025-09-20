@@ -30,7 +30,7 @@ export default function ContentSections({ activeSection, profileData, formatDate
             Experience
           </h2>
           
-          {profileData?.experiences.map((exp, index) => (
+          {profileData?.experiences.map((exp) => (
             <div key={exp.id} className="pb-12 border-b border-border last:border-b-0">
               <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
                 {/* Timeline & Location */}
@@ -72,7 +72,7 @@ export default function ContentSections({ activeSection, profileData, formatDate
             Projects
           </h2>
           
-          {profileData?.projects.map((project, index) => (
+          {profileData?.projects.map((project) => (
             <div key={project.id} className="pb-12 border-b border-border last:border-b-0">
               <div className="space-y-4">
                 <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">

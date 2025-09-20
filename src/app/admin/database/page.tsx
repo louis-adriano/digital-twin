@@ -16,7 +16,7 @@ interface TableData {
     is_nullable: string;
     column_default: string;
   }>;
-  rows: any[];
+  rows: Record<string, unknown>[];
   totalShown: number;
   limit: number;
 }
@@ -113,7 +113,7 @@ export default function DatabasePage() {
     }
   };
 
-  const formatValue = (value: any) => {
+  const formatValue = (value: unknown) => {
     if (value === null) return 'NULL';
     if (Array.isArray(value)) return JSON.stringify(value);
     if (typeof value === 'object') return JSON.stringify(value, null, 2);

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
 
 const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
@@ -102,12 +103,12 @@ export default function AdminLoginPage() {
           </div>
           
           <div className="text-center">
-            <a
+            <Link
               href="/"
               className="text-sm font-sans text-muted-foreground hover:text-foreground transition-colors"
             >
               ← Return to Portfolio
-            </a>
+            </Link>
           </div>
         </form>
       </div>

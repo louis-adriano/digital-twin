@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,16 +33,12 @@ export default function ProfileEditor() {
     resolver: zodResolver(profileSchema),
   });
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
-
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch('/api/admin/profile');
       if (!response.ok) throw new Error('Failed to load profile');
-      
+
       const profile = await response.json();
       reset({
         name: profile.name || '',
@@ -63,7 +59,11 @@ export default function ProfileEditor() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [reset]);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
 
   const onSubmit = async (data: ProfileForm) => {
     try {
@@ -205,7 +205,7 @@ export default function ProfileEditor() {
             rows={4}
             className="w-full px-3 py-2 border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent font-sans"
           />
-          <p className="mt-1 text-xs text-muted-foreground font-sans">Appears in the "About" section when users click Overview</p>
+          <p className="mt-1 text-xs text-muted-foreground font-sans">Appears in the &quot;About&quot; section when users click Overview</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

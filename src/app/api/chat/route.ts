@@ -22,7 +22,7 @@ const groq = new Groq({
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const ip = (request as any).ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = (request as NextRequest & { ip?: string }).ip || request.headers.get('x-forwarded-for') || 'unknown';
     const now = Date.now();
     const windowMs = 60 * 1000; // 1 minute
     const maxRequests = 10;
