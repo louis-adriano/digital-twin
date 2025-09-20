@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ProfileData } from '../types/profile';
 import FloatingChat from '../components/FloatingChat';
 import ContentSections from '../components/ContentSections';
@@ -10,6 +10,18 @@ export default function Home() {
   const [profileLoading, setProfileLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('overview');
   const [error, setError] = useState<string | null>(null);
+  
+  // Refs for sections
+  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const sections = [
+    { key: "overview", label: "Overview" },
+    { key: "experience", label: "Experience" },
+    { key: "projects", label: "Projects" },
+    { key: "skills", label: "Skills" },
+    { key: "education", label: "Education" },
+  ];
 
   // Load profile data
   useEffect(() => {
@@ -33,6 +45,64 @@ export default function Home() {
 
     loadProfile();
   }, []);
+
+  // Smooth scroll to section
+  const scrollToSection = useCallback((sectionKey: string) => {
+    const section = sectionRefs.current[sectionKey];
+    if (section) {
+      setActiveSection(sectionKey);
+      section.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  }, []);
+
+  // Intersection Observer to detect which section is in view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+            const sectionKey = entry.target.getAttribute('data-section');
+            if (sectionKey) {
+              setActiveSection(sectionKey);
+            }
+          }
+        });
+      },
+      {
+        threshold: [0.1, 0.3, 0.5, 0.7],
+        rootMargin: '-20% 0px -20% 0px',
+        root: containerRef.current
+      }
+    );
+
+    // Observe all sections
+    Object.values(sectionRefs.current).forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Keyboard navigation for quick jumping
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const currentIndex = sections.findIndex(s => s.key === activeSection);
+      
+      if (e.key === 'ArrowDown' && currentIndex < sections.length - 1) {
+        e.preventDefault();
+        scrollToSection(sections[currentIndex + 1].key);
+      } else if (e.key === 'ArrowUp' && currentIndex > 0) {
+        e.preventDefault();
+        scrollToSection(sections[currentIndex - 1].key);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeSection, scrollToSection, sections]);
 
   // Format date helper
   const formatDate = (dateString: string | null) => {
@@ -141,25 +211,19 @@ export default function Home() {
       <div className="px-8 lg:px-16">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
-            {/* Left Column - Navigation */}
+            {/* Left Column - Sticky Navigation */}
             <div className="lg:col-span-3">
               <nav className="sticky top-8">
                 <p className="text-sm uppercase tracking-widest text-muted-foreground mb-8 font-medium font-sans">Sections</p>
                 <div className="space-y-4">
-                  {[
-                    { key: "overview", label: "Overview" },
-                    { key: "experience", label: "Experience" },
-                    { key: "projects", label: "Projects" },
-                    { key: "skills", label: "Skills" },
-                    { key: "education", label: "Education" },
-                  ].map((section) => (
+                  {sections.map((section) => (
                     <button
                       key={section.key}
-                      onClick={() => setActiveSection(section.key)}
-                      className={`block text-left transition-all duration-300 text-lg font-sans ${
+                      onClick={() => scrollToSection(section.key)}
+                      className={`block text-left transition-all duration-500 ease-out font-sans ${
                         activeSection === section.key
-                          ? "text-foreground font-medium border-l-2 border-foreground pl-4"
-                          : "text-muted-foreground hover:text-foreground hover:pl-2"
+                          ? "text-foreground font-medium border-l-4 border-foreground pl-6 text-xl transform scale-105"
+                          : "text-muted-foreground hover:text-foreground hover:pl-2 text-lg hover:transform hover:scale-102"
                       }`}
                     >
                       {section.label}
@@ -169,13 +233,33 @@ export default function Home() {
               </nav>
             </div>
 
-            {/* Right Column - Content */}
-            <div className="lg:col-span-9 space-y-32 pb-40">
-              <ContentSections 
-                activeSection={activeSection} 
-                profileData={profileData} 
-                formatDate={formatDate} 
-              />
+            {/* Right Column - Continuous Scroll Content */}
+            <div className="lg:col-span-9">
+              <div 
+                ref={containerRef}
+                className="h-screen overflow-y-auto scrollbar-hide"
+                style={{ scrollBehavior: 'smooth' }}
+              >
+                <div className="space-y-16">
+                  {sections.map((section) => (
+                    <div
+                      key={section.key}
+                      ref={(el) => {
+                        sectionRefs.current[section.key] = el;
+                      }}
+                      data-section={section.key}
+                      className="py-8"
+                    >
+                      <ContentSections 
+                        activeSection={section.key}
+                        profileData={profileData} 
+                        formatDate={formatDate}
+                        singleSection={true}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -4,14 +4,36 @@ interface ContentSectionsProps {
   activeSection: string;
   profileData: ProfileData | null;
   formatDate: (dateString: string | null) => string;
+  singleSection?: boolean;
 }
 
-export default function ContentSections({ activeSection, profileData, formatDate }: ContentSectionsProps) {
+export default function ContentSections({ activeSection, profileData, formatDate, singleSection = false }: ContentSectionsProps) {
+  // If singleSection is true, only render the active section
+  if (singleSection) {
+    return (
+      <div className="space-y-12">
+        {renderSection(activeSection, profileData, formatDate)}
+      </div>
+    );
+  }
+
+  // Original behavior - render all sections based on activeSection
   return (
     <>
-      {/* Overview */}
-      {activeSection === "overview" && (
-        <div className="space-y-12 min-h-screen py-12">
+      {activeSection === "overview" && renderSection("overview", profileData, formatDate)}
+      {activeSection === "experience" && renderSection("experience", profileData, formatDate)}
+      {activeSection === "projects" && renderSection("projects", profileData, formatDate)}
+      {activeSection === "skills" && renderSection("skills", profileData, formatDate)}
+      {activeSection === "education" && renderSection("education", profileData, formatDate)}
+    </>
+  );
+}
+
+function renderSection(section: string, profileData: ProfileData | null, formatDate: (dateString: string | null) => string) {
+  switch (section) {
+    case "overview":
+      return (
+        <div className="space-y-12 py-12">
           <div className="max-w-3xl">
             <h2 className="font-serif text-3xl lg:text-4xl font-bold text-foreground mb-8">
               About
@@ -21,11 +43,11 @@ export default function ContentSections({ activeSection, profileData, formatDate
             </p>
           </div>
         </div>
-      )}
+      );
 
-      {/* Experience */}
-      {activeSection === "experience" && (
-        <div className="space-y-12 min-h-screen py-12">
+    case "experience":
+      return (
+        <div className="space-y-12 py-12">
           <h2 className="font-serif text-3xl lg:text-4xl font-bold text-foreground mb-8">
             Experience
           </h2>
@@ -63,11 +85,11 @@ export default function ContentSections({ activeSection, profileData, formatDate
             </div>
           ))}
         </div>
-      )}
+      );
 
-      {/* Projects */}
-      {activeSection === "projects" && (
-        <div className="space-y-12 min-h-screen py-12">
+    case "projects":
+      return (
+        <div className="space-y-12 py-12">
           <h2 className="font-serif text-3xl lg:text-4xl font-bold text-foreground mb-8">
             Projects
           </h2>
@@ -127,11 +149,11 @@ export default function ContentSections({ activeSection, profileData, formatDate
             </div>
           ))}
         </div>
-      )}
+      );
 
-      {/* Skills */}
-      {activeSection === "skills" && (
-        <div className="space-y-12 min-h-screen py-12">
+    case "skills":
+      return (
+        <div className="space-y-12 py-12">
           <h2 className="font-serif text-3xl lg:text-4xl font-bold text-foreground mb-8">
             Skills
           </h2>
@@ -179,11 +201,11 @@ export default function ContentSections({ activeSection, profileData, formatDate
               </div>
             ))}
         </div>
-      )}
+      );
 
-      {/* Education */}
-      {activeSection === "education" && (
-        <div className="space-y-12 min-h-screen py-12">
+    case "education":
+      return (
+        <div className="space-y-12 py-12">
           <h2 className="font-serif text-3xl lg:text-4xl font-bold text-foreground mb-8">
             Education
           </h2>
@@ -223,7 +245,15 @@ export default function ContentSections({ activeSection, profileData, formatDate
             </div>
           ))}
         </div>
-      )}
-    </>
-  );
+      );
+
+    default:
+      return (
+        <div className="space-y-12 py-12">
+          <div className="text-center">
+            <p className="text-muted-foreground font-sans">Section not found</p>
+          </div>
+        </div>
+      );
+  }
 }
