@@ -67,25 +67,43 @@ export default function Home() {
     const timer = setTimeout(() => {
       const observer = new IntersectionObserver(
         (entries) => {
-          // Find the entry with highest intersection ratio
-          let maxEntry = entries[0];
-          entries.forEach((entry) => {
-            if (entry.intersectionRatio > (maxEntry?.intersectionRatio || 0)) {
-              maxEntry = entry;
+          // Sort entries by their position in the viewport
+          const visibleEntries = entries.filter(entry => entry.isIntersecting);
+          
+          if (visibleEntries.length === 0) return;
+
+          // Find the section that's most centered in the viewport
+          let bestEntry = visibleEntries[0];
+          let bestDistance = Infinity;
+
+          visibleEntries.forEach((entry) => {
+            const rect = entry.boundingClientRect;
+            const containerRect = entry.rootBounds;
+            
+            if (containerRect) {
+              // Calculate distance from center of viewport
+              const elementCenter = rect.top + rect.height / 2;
+              const viewportCenter = containerRect.height / 2;
+              const distance = Math.abs(elementCenter - viewportCenter);
+              
+              if (distance < bestDistance) {
+                bestDistance = distance;
+                bestEntry = entry;
+              }
             }
           });
 
-          if (maxEntry && maxEntry.isIntersecting && maxEntry.intersectionRatio > 0.2) {
-            const sectionKey = maxEntry.target.getAttribute('data-section');
-            if (sectionKey) {
+          if (bestEntry) {
+            const sectionKey = bestEntry.target.getAttribute('data-section');
+            if (sectionKey && sectionKey !== activeSection) {
               setActiveSection(sectionKey);
             }
           }
         },
         {
           root: container,
-          threshold: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
-          rootMargin: '-100px 0px -60% 0px'
+          threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+          rootMargin: '-20% 0px -20% 0px'
         }
       );
 
@@ -98,7 +116,7 @@ export default function Home() {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [profileData]);
+  }, [profileData, activeSection]);
 
   // Keyboard navigation for quick jumping
   useEffect(() => {
@@ -272,7 +290,7 @@ export default function Home() {
                         sectionRefs.current[section.key] = el;
                       }}
                       data-section={section.key}
-                      className="py-8"
+                      className="py-8 min-h-[60vh]"
                     >
                       <ContentSections 
                         activeSection={section.key}
