@@ -51,12 +51,7 @@ export const contextTools: Tool[] = [
           type: 'string',
           description: 'Filter by specific technology category (e.g., "Programming Languages", "Frontend Frameworks")'
         },
-        min_proficiency: {
-          type: 'number',
-          minimum: 1,
-          maximum: 5,
-          description: 'Minimum proficiency level to include (1-5)'
-        }
+
       },
       required: []
     }
@@ -207,7 +202,7 @@ export const handleGetCompleteProfile = async (args: any): Promise<CallToolResul
       const skills = await connectAndQuery(async (client) => {
         const result = await client.query(`
           SELECT * FROM skills 
-          ORDER BY category, proficiency_level DESC, name
+          ORDER BY category, name
         `);
         return result.rows;
       });
@@ -227,8 +222,7 @@ export const handleGetCompleteProfile = async (args: any): Promise<CallToolResul
         Object.entries(skillsByCategory).forEach(([category, catSkills]) => {
           completeProfile += `### ${category}\n\n`;
           catSkills.forEach((skill: any) => {
-            const proficiencyText = ['', 'Beginner', 'Basic', 'Intermediate', 'Advanced', 'Expert'][skill.proficiency_level];
-            completeProfile += `• **${skill.name}** - ${proficiencyText} (${skill.proficiency_level}/5)`;
+            completeProfile += `• **${skill.name}**`;
             
             if (skill.years_experience) {
               completeProfile += ` | ${skill.years_experience} years`;
@@ -501,7 +495,7 @@ export const handleGenerateProfessionalSummary = async (args: any): Promise<Call
         return result.rows;
       }),
       connectAndQuery(async (client) => {
-        const result = await client.query('SELECT * FROM skills WHERE proficiency_level >= 4 ORDER BY proficiency_level DESC, years_experience DESC LIMIT 8');
+        const result = await client.query('SELECT * FROM skills ORDER BY years_experience DESC, name LIMIT 8');
         return result.rows;
       }),
       connectAndQuery(async (client) => {
@@ -537,8 +531,7 @@ export const handleGenerateProfessionalSummary = async (args: any): Promise<Call
       summary += `**Core Competencies:**\n`;
       const topSkills = skills.slice(0, length === 'brief' ? 4 : 6);
       topSkills.forEach((skill: any) => {
-        const proficiencyText = ['', 'Beginner', 'Basic', 'Intermediate', 'Advanced', 'Expert'][skill.proficiency_level];
-        summary += `• ${skill.name} (${proficiencyText})`;
+        summary += `• ${skill.name}`;
         if (skill.years_experience) {
           summary += ` - ${skill.years_experience} years`;
         }

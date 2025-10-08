@@ -25,7 +25,6 @@ export interface ProfileData {
     id: number;
     name: string;
     category: string;
-    proficiency_level: number;
     years_experience: number;
     description: string;
   }>;

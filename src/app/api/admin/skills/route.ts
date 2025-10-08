@@ -8,7 +8,6 @@ import { z } from 'zod';
 const skillSchema = z.object({
   name: z.string().min(1, 'Skill name is required'),
   category: z.string().min(1, 'Category is required'),
-  proficiency_level: z.number().min(1).max(5, 'Proficiency must be between 1-5'),
   years_experience: z.number().min(0).optional(),
   description: z.string().optional(),
 });
@@ -65,14 +64,13 @@ export async function POST(request: NextRequest) {
 
     const result = await client.query(
       `INSERT INTO skills (
-        professional_id, name, category, proficiency_level, years_experience, description
-      ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+        professional_id, name, category, years_experience, description
+      ) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [
         professionalId,
         validatedData.name,
         validatedData.category,
-        validatedData.proficiency_level,
-        validatedData.years_experience || null,
+        validatedData.years_experience,
         validatedData.description || null,
       ]
     );

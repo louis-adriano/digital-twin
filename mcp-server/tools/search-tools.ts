@@ -283,7 +283,7 @@ export const handleSearchExperiences = async (args: any): Promise<CallToolResult
 
 export const handleSearchSkills = async (args: any): Promise<CallToolResult> => {
   try {
-    const { query, category, min_proficiency, min_experience_years } = args;
+    const { query, category, min_experience_years } = args;
 
     const skills = await connectAndQuery(async (client) => {
       let sql = `
@@ -304,11 +304,7 @@ export const handleSearchSkills = async (args: any): Promise<CallToolResult> => 
         paramIndex++;
       }
 
-      if (min_proficiency) {
-        sql += ` AND s.proficiency_level >= $${paramIndex}`;
-        params.push(min_proficiency);
-        paramIndex++;
-      }
+
 
       if (min_experience_years) {
         sql += ` AND s.years_experience >= $${paramIndex}`;
@@ -316,7 +312,7 @@ export const handleSearchSkills = async (args: any): Promise<CallToolResult> => 
         paramIndex++;
       }
 
-      sql += ` ORDER BY s.category, s.proficiency_level DESC, s.name`;
+      sql += ` ORDER BY s.category, s.name`;
 
       const result = await client.query(sql, params);
       return result.rows;
@@ -342,8 +338,7 @@ export const handleSearchSkills = async (args: any): Promise<CallToolResult> => 
 
     const formattedSkills = Object.entries(skillsByCategory).map(([cat, catSkills]) => {
       const skillList = catSkills.map((skill: any) => {
-        const proficiencyText = ['', 'Beginner', 'Basic', 'Intermediate', 'Advanced', 'Expert'][skill.proficiency_level];
-        let skillInfo = `  • **${skill.name}** - ${proficiencyText} (${skill.proficiency_level}/5)`;
+        let skillInfo = `  • **${skill.name}**`;
         
         if (skill.years_experience) {
           skillInfo += ` | ${skill.years_experience} years experience`;

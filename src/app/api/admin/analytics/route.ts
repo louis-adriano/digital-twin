@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
       case 'skills':
         const skillsData = await client.query(`
-          SELECT category, COUNT(*) as count, AVG(proficiency_level) as avg_proficiency
+          SELECT category, COUNT(*) as count
           FROM skills 
           GROUP BY category 
           ORDER BY count DESC
@@ -49,7 +49,6 @@ export async function GET(request: NextRequest) {
           skillsByCategory: skillsData.rows.map(row => ({
             category: row.category,
             count: parseInt(row.count),
-            avgProficiency: parseFloat(row.avg_proficiency).toFixed(1),
           })),
         };
         break;

@@ -6,6 +6,7 @@ config({ path: '.env.local' });
 import { NextRequest, NextResponse } from 'next/server';
 import { Index } from '@upstash/vector';
 import Groq from 'groq-sdk';
+import { Client } from 'pg';
 
 // Simple in-memory rate limiting (use Redis for production)
 const RATE_LIMIT = new Map();
@@ -17,6 +18,10 @@ const index = new Index({
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY!,
+});
+
+const getDbClient = () => new Client({
+  connectionString: process.env.DATABASE_URL,
 });
 
 export async function POST(request: NextRequest) {
@@ -62,8 +67,36 @@ export async function POST(request: NextRequest) {
     }
 
     const message = body.message.trim();
+    const sessionId = body.sessionId;
 
     console.log('🔍 User inquiry:', message);
+
+    // STEP 0: Get conversation history for context
+    let conversationHistory: Array<{role: string, content: string}> = [];
+    if (sessionId) {
+      try {
+        const client = getDbClient();
+        await client.connect();
+        
+        const historyResult = await client.query(
+          `SELECT message, role FROM chat_messages 
+           WHERE session_id = $1 
+           ORDER BY created_at ASC 
+           LIMIT 10`,
+          [sessionId]
+        );
+        
+        conversationHistory = historyResult.rows.map(row => ({
+          role: row.role,
+          content: row.message,
+        }));
+        
+        await client.end();
+        console.log(`💭 Loaded ${conversationHistory.length} previous messages`);
+      } catch (error) {
+        console.error('Error loading conversation history:', error);
+      }
+    }
 
     // STEP 1: AI translates user inquiry into better vector search query
     console.log('🧠 Step 1: Translating user query for vector search...');
@@ -120,7 +153,7 @@ Transform the user's question into 3-5 key search terms that will find the most 
         const metadata = result.metadata || {};
         switch (metadata.type) {
           case 'skill':
-            return `${metadata.name} (${metadata.category}) - Level ${metadata.proficiency_level}/5`;
+            return `${metadata.name} (${metadata.category})`;
           case 'experience':
             return `${metadata.position} at ${metadata.company}`;
           case 'project':
@@ -141,28 +174,39 @@ Transform the user's question into 3-5 key search terms that will find the most 
     // STEP 4: AI interprets data and responds in human talk
     console.log('🤖 Step 4: AI generating conversational response...');
     
-    const stream = await groq.chat.completions.create({
-      messages: [
-        {
-          role: 'system',
-          content: `You are Louis Adriano, a full-stack developer. Respond naturally and conversationally in first person as if you're Louis himself talking to someone.
+    // Build conversation messages with history
+    const conversationMessages = [
+      {
+        role: 'system' as const,
+        content: `You are Louis Adriano, a full-stack developer. Respond naturally and conversationally in first person as if you're Louis himself talking to someone.
 
 Guidelines:
 - Always respond in first person ("I", "my", "me")
 - Be conversational and friendly, but professional
 - Use the context to give specific, detailed answers
+- Consider previous conversation when responding
 - Don't mention AI, context, or data - just speak naturally
 - If multiple topics are in context, organize your response clearly
 - Keep responses engaging and informative
+- Reference previous parts of our conversation when relevant
 
 Context about your professional background:
 ${context}`
-        },
-        {
-          role: 'user',
-          content: message
-        }
-      ],
+      },
+      // Include conversation history
+      ...conversationHistory.map(msg => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content
+      })),
+      // Add current user message
+      {
+        role: 'user' as const,
+        content: message
+      }
+    ];
+    
+    const stream = await groq.chat.completions.create({
+      messages: conversationMessages,
       model: 'llama-3.1-8b-instant',
       temperature: 0.7,
       max_tokens: 400,
@@ -171,16 +215,50 @@ ${context}`
 
     // Create streaming response
     const encoder = new TextEncoder();
+    let fullResponse = '';
+    
     const readable = new ReadableStream({
       async start(controller) {
         try {
+          // Save user message first
+          if (sessionId) {
+            try {
+              const client = getDbClient();
+              await client.connect();
+              await client.query(
+                'INSERT INTO chat_messages (session_id, message, role, created_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)',
+                [sessionId, message, 'user']
+              );
+              await client.end();
+            } catch (error) {
+              console.error('Error saving user message:', error);
+            }
+          }
+
           for await (const chunk of stream) {
             const content = chunk.choices[0]?.delta?.content || '';
             if (content) {
+              fullResponse += content;
               const data = `data: ${JSON.stringify({ content })}\n\n`;
               controller.enqueue(encoder.encode(data));
             }
           }
+          
+          // Save assistant response
+          if (sessionId && fullResponse) {
+            try {
+              const client = getDbClient();
+              await client.connect();
+              await client.query(
+                'INSERT INTO chat_messages (session_id, message, role, created_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)',
+                [sessionId, fullResponse, 'assistant']
+              );
+              await client.end();
+            } catch (error) {
+              console.error('Error saving assistant message:', error);
+            }
+          }
+          
           controller.enqueue(encoder.encode('data: [DONE]\n\n'));
           controller.close();
         } catch (error) {

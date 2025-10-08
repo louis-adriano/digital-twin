@@ -5,10 +5,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Client } from 'pg';
 import { z } from 'zod';
 
-const skillUpdateSchema = z.object({
+const updateSkillSchema = z.object({
   name: z.string().min(1, 'Skill name is required'),
   category: z.string().min(1, 'Category is required'),
-  proficiency_level: z.number().min(1).max(5, 'Proficiency must be between 1-5'),
   years_experience: z.number().min(0).optional(),
   description: z.string().optional(),
 });
@@ -19,7 +18,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const validatedData = skillUpdateSchema.parse(body);
+    const validatedData = updateSkillSchema.parse(body);
     const { id } = await params;
 
     const client = new Client({
@@ -30,13 +29,11 @@ export async function PUT(
 
     const result = await client.query(
       `UPDATE skills SET 
-        name = $1, category = $2, proficiency_level = $3, 
-        years_experience = $4, description = $5
-      WHERE id = $6 RETURNING *`,
+        name = $1, category = $2, years_experience = $3, description = $4
+      WHERE id = $5 RETURNING *`,
       [
         validatedData.name,
         validatedData.category,
-        validatedData.proficiency_level,
         validatedData.years_experience || null,
         validatedData.description || null,
         id,

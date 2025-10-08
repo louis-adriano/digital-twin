@@ -8,7 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 const skillSchema = z.object({
   name: z.string().min(1, 'Skill name is required'),
   category: z.string().min(1, 'Category is required'),
-  proficiency_level: z.coerce.number().min(1).max(5, 'Proficiency must be between 1-5'),
   years_experience: z.coerce.number().min(0).optional(),
   description: z.string().optional(),
 });
@@ -19,7 +18,6 @@ interface Skill {
   id: number;
   name: string;
   category: string;
-  proficiency_level: number;
   years_experience?: number;
   description?: string;
 }
@@ -55,12 +53,11 @@ export default function SkillsManager() {
   } = useForm<SkillForm>({
     resolver: zodResolver(skillSchema),
     defaultValues: {
-      proficiency_level: 3,
       years_experience: 1,
     },
   });
 
-  const watchedProficiency = watch('proficiency_level');
+
 
   useEffect(() => {
     loadSkills();
@@ -112,7 +109,7 @@ export default function SkillsManager() {
         text: editingId ? 'Skill updated successfully!' : 'Skill added successfully!' 
       });
       
-      reset({ proficiency_level: 3, years_experience: 1 });
+      reset({ years_experience: 1 });
       setShowForm(false);
       setEditingId(null);
       loadSkills();
@@ -131,7 +128,7 @@ export default function SkillsManager() {
     reset({
       name: skill.name,
       category: skill.category,
-      proficiency_level: skill.proficiency_level,
+
       years_experience: skill.years_experience || 1,
       description: skill.description || '',
     });
@@ -164,26 +161,12 @@ export default function SkillsManager() {
   const handleCancel = () => {
     setShowForm(false);
     setEditingId(null);
-    reset({ proficiency_level: 3, years_experience: 1 });
+    reset({ years_experience: 1 });
   };
 
-  const getProficiencyText = (level: number) => {
-    const levels = {
-      1: 'Beginner',
-      2: 'Basic',
-      3: 'Intermediate',
-      4: 'Advanced',
-      5: 'Expert'
-    };
-    return levels[level as keyof typeof levels] || 'Unknown';
-  };
 
-  const getProficiencyColor = (level: number) => {
-    if (level >= 4) return 'text-green-600 bg-green-100';
-    if (level >= 3) return 'text-blue-600 bg-blue-100';
-    if (level >= 2) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
-  };
+
+
 
   // Group skills by category
   const groupedSkills = skills.reduce((acc, skill) => {
@@ -259,29 +242,7 @@ export default function SkillsManager() {
                 )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Proficiency Level * ({getProficiencyText(watchedProficiency || 3)})
-                </label>
-                <input
-                  {...register('proficiency_level')}
-                  type="range"
-                  min="1"
-                  max="5"
-                  step="1"
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                />
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>Beginner</span>
-                  <span>Basic</span>
-                  <span>Intermediate</span>
-                  <span>Advanced</span>
-                  <span>Expert</span>
-                </div>
-                {errors.proficiency_level && (
-                  <p className="mt-1 text-sm text-red-600">{errors.proficiency_level.message}</p>
-                )}
-              </div>
+
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -381,13 +342,6 @@ export default function SkillsManager() {
                       </div>
                       
                       <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-500">Proficiency</span>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getProficiencyColor(skill.proficiency_level)}`}>
-                            {getProficiencyText(skill.proficiency_level)}
-                          </span>
-                        </div>
-                        
                         {skill.years_experience && (
                           <div className="flex justify-between items-center">
                             <span className="text-xs text-gray-500">Experience</span>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface ChatMessage {
   id: number;
@@ -15,6 +15,8 @@ export default function FloatingChat() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +44,74 @@ export default function FloatingChat() {
       setTimeout(scrollToBottom, 200);
     }
   }, [isChatOpen, chatMessages.length]);
+
+  // Initialize or restore session when chat opens
+  useEffect(() => {
+    if (isChatOpen && !sessionId && !sessionLoading) {
+      initializeSession();
+    }
+  }, [isChatOpen, sessionId, sessionLoading]);
+
+  // Save messages to localStorage for backup
+  useEffect(() => {
+    if (sessionId && chatMessages.length > 0) {
+      localStorage.setItem(`chat_messages_${sessionId}`, JSON.stringify(chatMessages));
+    }
+  }, [sessionId, chatMessages]);
+
+  const initializeSession = useCallback(async () => {
+    setSessionLoading(true);
+    try {
+      // Try to restore from localStorage first
+      const savedSessionId = localStorage.getItem('chat_session_id');
+      
+      const response = await fetch('/api/chat/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: savedSessionId }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSessionId(data.sessionId);
+        localStorage.setItem('chat_session_id', data.sessionId);
+        
+        // Load conversation history
+        await loadChatHistory(data.sessionId);
+      }
+    } catch (error) {
+      console.error('Failed to initialize session:', error);
+    } finally {
+      setSessionLoading(false);
+    }
+  }, []);
+
+  const loadChatHistory = async (sid: string) => {
+    try {
+      const response = await fetch(`/api/chat/session?sessionId=${sid}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.messages && data.messages.length > 0) {
+          setChatMessages(data.messages);
+        } else {
+          // Fallback to localStorage if no server history
+          const saved = localStorage.getItem(`chat_messages_${sid}`);
+          if (saved) {
+            const savedMessages = JSON.parse(saved);
+            setChatMessages(savedMessages);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load chat history:', error);
+      // Fallback to localStorage
+      const saved = localStorage.getItem(`chat_messages_${sid}`);
+      if (saved) {
+        const savedMessages = JSON.parse(saved);
+        setChatMessages(savedMessages);
+      }
+    }
+  };
 
   const sendMessage = async (message: string) => {
     if (!message.trim()) return;
@@ -71,7 +141,7 @@ export default function FloatingChat() {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, sessionId }),
       });
 
       if (!response.ok) {
@@ -169,16 +239,39 @@ export default function FloatingChat() {
             <div className="flex justify-between items-center p-6 border-b border-border bg-card flex-shrink-0">
               <div>
                 <h3 className="font-serif text-2xl font-semibold text-foreground">Ask My Digital Twin</h3>
-                <p className="text-sm text-muted-foreground font-sans mt-1">Chat with AI about my background</p>
+                <div className="flex items-center space-x-2 mt-1">
+                  <p className="text-sm text-muted-foreground font-sans">Chat with AI about my background</p>
+                  {sessionId && (
+                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Connected</span>
+                  )}
+                </div>
               </div>
-              <button
-                onClick={() => setIsChatOpen(false)}
-                className="text-muted-foreground hover:text-foreground transition-colors p-1"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <div className="flex items-center space-x-2">
+                {chatMessages.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setChatMessages([]);
+                      if (sessionId) {
+                        localStorage.removeItem(`chat_messages_${sessionId}`);
+                        localStorage.removeItem('chat_session_id');
+                        setSessionId(null);
+                      }
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors p-1 text-sm"
+                    title="Clear conversation"
+                  >
+                    🗑️
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsChatOpen(false)}
+                  className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
             
             {/* Chat Messages */}

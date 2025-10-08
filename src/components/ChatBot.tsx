@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface ChatMessage {
   id: number;
@@ -14,6 +14,8 @@ export default function ChatBot() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when messages change
@@ -24,6 +26,60 @@ export default function ChatBot() {
   useEffect(() => {
     scrollToBottom();
   }, [chatMessages]);
+
+  // Initialize session on component mount
+  useEffect(() => {
+    if (!sessionId && !sessionLoading) {
+      initializeSession();
+    }
+  }, [sessionId, sessionLoading]);
+
+  // Save messages to localStorage for backup
+  useEffect(() => {
+    if (sessionId && chatMessages.length > 0) {
+      localStorage.setItem(`chat_messages_${sessionId}`, JSON.stringify(chatMessages));
+    }
+  }, [sessionId, chatMessages]);
+
+  const initializeSession = useCallback(async () => {
+    setSessionLoading(true);
+    try {
+      const savedSessionId = localStorage.getItem('chat_session_id');
+      
+      const response = await fetch('/api/chat/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: savedSessionId }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSessionId(data.sessionId);
+        localStorage.setItem('chat_session_id', data.sessionId);
+        
+        // Load conversation history
+        await loadChatHistory(data.sessionId);
+      }
+    } catch (error) {
+      console.error('Failed to initialize session:', error);
+    } finally {
+      setSessionLoading(false);
+    }
+  }, []);
+
+  const loadChatHistory = async (sid: string) => {
+    try {
+      const response = await fetch(`/api/chat/session?sessionId=${sid}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.messages && data.messages.length > 0) {
+          setChatMessages(data.messages);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load chat history:', error);
+    }
+  };
 
   const handleChatSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +127,7 @@ export default function ChatBot() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, sessionId }),
       });
 
       if (!response.ok) {
@@ -148,8 +204,33 @@ export default function ChatBot() {
     <div className="bg-white rounded-lg shadow-lg flex flex-col h-[600px]">
       {/* Chat Header */}
       <div className="p-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Ask My Digital Twin</h3>
-        <p className="text-sm text-gray-600">Chat with AI about my background</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Ask My Digital Twin</h3>
+            <div className="flex items-center space-x-2">
+              <p className="text-sm text-gray-600">Chat with AI about my background</p>
+              {sessionId && (
+                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Connected</span>
+              )}
+            </div>
+          </div>
+          {chatMessages.length > 0 && (
+            <button
+              onClick={() => {
+                setChatMessages([]);
+                if (sessionId) {
+                  localStorage.removeItem(`chat_messages_${sessionId}`);
+                  localStorage.removeItem('chat_session_id');
+                  setSessionId(null);
+                }
+              }}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-1 text-sm"
+              title="Clear conversation"
+            >
+              🗑️
+            </button>
+          )}
+        </div>
       </div>
       
       {/* Chat Messages */}
