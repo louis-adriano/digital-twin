@@ -17,7 +17,7 @@ import { config } from 'dotenv';
 // Load environment variables (suppress dotenv output to avoid Claude Desktop JSON parsing issues)
 const originalWrite = process.stdout.write;
 process.stdout.write = () => true;
-config({ path: '.env.local' });
+config({ path: '../.env.local' });
 process.stdout.write = originalWrite;
 
 // Database connections

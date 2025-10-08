@@ -2,11 +2,17 @@ import { Tool, CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { connectAndQuery, handleError } from '../index.js';
 import { Index } from '@upstash/vector';
 
-// Vector index instance
-const vectorIndex = new Index({
-  url: process.env.UPSTASH_VECTOR_REST_URL!,
-  token: process.env.UPSTASH_VECTOR_REST_TOKEN!,
-});
+// Lazy-load vector index instance to ensure env vars are loaded first
+let vectorIndex: Index | null = null;
+const getVectorIndex = () => {
+  if (!vectorIndex) {
+    vectorIndex = new Index({
+      url: process.env.UPSTASH_VECTOR_REST_URL!,
+      token: process.env.UPSTASH_VECTOR_REST_TOKEN!,
+    });
+  }
+  return vectorIndex;
+};
 
 // Professional search tools
 export const searchTools: Tool[] = [
@@ -133,7 +139,7 @@ export const handleSemanticSearch = async (args: any): Promise<CallToolResult> =
   try {
     const { query, limit = 10, min_score = 0.7 } = args;
 
-    const searchResults = await vectorIndex.query({
+    const searchResults = await getVectorIndex().query({
       data: query,
       topK: limit,
       includeMetadata: true,

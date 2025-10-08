@@ -60,31 +60,45 @@ export default function Home() {
 
   // Intersection Observer to detect which section is in view
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
-            const sectionKey = entry.target.getAttribute('data-section');
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Small delay to ensure refs are mounted
+    const timer = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          // Find the entry with highest intersection ratio
+          let maxEntry = entries[0];
+          entries.forEach((entry) => {
+            if (entry.intersectionRatio > (maxEntry?.intersectionRatio || 0)) {
+              maxEntry = entry;
+            }
+          });
+
+          if (maxEntry && maxEntry.isIntersecting && maxEntry.intersectionRatio > 0.2) {
+            const sectionKey = maxEntry.target.getAttribute('data-section');
             if (sectionKey) {
               setActiveSection(sectionKey);
             }
           }
-        });
-      },
-      {
-        threshold: [0.1, 0.3, 0.5, 0.7],
-        rootMargin: '-20% 0px -20% 0px',
-        root: containerRef.current
-      }
-    );
+        },
+        {
+          root: container,
+          threshold: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+          rootMargin: '-100px 0px -60% 0px'
+        }
+      );
 
-    // Observe all sections
-    Object.values(sectionRefs.current).forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
+      // Observe all sections
+      Object.values(sectionRefs.current).forEach((ref) => {
+        if (ref) observer.observe(ref);
+      });
 
-    return () => observer.disconnect();
-  }, []);
+      return () => observer.disconnect();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [profileData]);
 
   // Keyboard navigation for quick jumping
   useEffect(() => {

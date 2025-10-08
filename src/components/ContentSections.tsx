@@ -1,4 +1,5 @@
 import { ProfileData } from '../types/profile';
+import { useState } from 'react';
 
 interface ContentSectionsProps {
   activeSection: string;
@@ -88,68 +89,7 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
       );
 
     case "projects":
-      return (
-        <div className="space-y-12 py-12">
-          <h2 className="font-serif text-3xl lg:text-4xl font-bold text-foreground mb-8">
-            Projects
-          </h2>
-          
-          {profileData?.projects.map((project) => (
-            <div key={project.id} className="pb-12 border-b border-border last:border-b-0">
-              <div className="space-y-4">
-                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
-                  <div className="flex-1">
-                    <h3 className="font-serif text-xl lg:text-2xl font-bold text-foreground mb-3">
-                      {project.name}
-                    </h3>
-                    <p className="text-base leading-relaxed text-foreground font-light font-sans max-w-2xl mb-4">
-                      {project.description}
-                    </p>
-                    
-                    {/* Links */}
-                    <div className="flex gap-4 mb-4">
-                      {project.github_url && (
-                        <a
-                          href={project.github_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-foreground hover:text-muted-foreground transition-colors text-sm uppercase tracking-wide font-medium font-sans"
-                        >
-                          Code
-                        </a>
-                      )}
-                      {project.live_url && (
-                        <a
-                          href={project.live_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-foreground hover:text-muted-foreground transition-colors text-sm uppercase tracking-wide font-medium font-sans"
-                        >
-                          Demo
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* Technologies */}
-                  <div className="lg:w-64">
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground font-medium font-sans mb-2">
-                      Stack
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {project.technologies.map((tech) => (
-                        <span key={tech} className="text-xs text-foreground bg-muted px-2 py-1 font-sans">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      );
+      return <ProjectsGrid projects={profileData?.projects || []} />;
 
     case "skills":
       return (
@@ -253,4 +193,154 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
         </div>
       );
   }
+}
+
+// Projects Grid Component with Popover
+function ProjectsGrid({ projects }: { projects: any[] }) {
+  const [selectedProject, setSelectedProject] = useState<any | null>(null);
+
+  return (
+    <div className="space-y-12 py-12">
+      <h2 className="font-serif text-3xl lg:text-4xl font-bold text-foreground mb-8">
+        Projects
+      </h2>
+
+      {/* Grid of Project Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {projects.map((project) => (
+          <button
+            key={project.id}
+            onClick={() => setSelectedProject(project)}
+            className="group text-left bg-background border border-border hover:border-foreground transition-all duration-300 overflow-hidden hover:shadow-lg"
+          >
+            {/* Image Placeholder */}
+            <div className="relative h-48 bg-muted overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/40">
+                <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Card Content */}
+            <div className="p-6">
+              <h3 className="font-serif text-xl font-bold text-foreground mb-3 group-hover:text-foreground/80 transition-colors">
+                {project.name}
+              </h3>
+
+              <p className="text-sm text-muted-foreground font-light font-sans line-clamp-3 mb-4">
+                {project.description}
+              </p>
+
+              {/* Tech Stack Preview */}
+              {project.technologies && project.technologies.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {project.technologies.slice(0, 3).map((tech) => (
+                    <span key={tech} className="text-xs text-muted-foreground border border-border px-2 py-1 font-sans">
+                      {tech}
+                    </span>
+                  ))}
+                  {project.technologies.length > 3 && (
+                    <span className="text-xs text-muted-foreground font-sans">
+                      +{project.technologies.length - 3} more
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Popover Modal */}
+      {selectedProject && (
+        <div
+          className="fixed inset-0 bg-background/90 backdrop-blur-md z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedProject(null)}
+        >
+          <div
+            className="relative bg-background border border-border max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedProject(null)}
+              className="absolute top-6 right-6 z-10 text-muted-foreground hover:text-foreground transition-colors text-3xl w-12 h-12 flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border hover:border-foreground"
+              aria-label="Close"
+            >
+              ×
+            </button>
+
+            {/* Project Image */}
+            <div className="relative h-64 lg:h-80 bg-muted overflow-hidden border-b border-border">
+              <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/40">
+                <svg className="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-8 lg:p-12">
+              {/* Title */}
+              <h3 className="font-serif text-3xl lg:text-5xl font-bold text-foreground mb-4">
+                {selectedProject.name}
+              </h3>
+
+              {/* Description */}
+              <p className="text-base lg:text-xl leading-relaxed text-foreground font-light font-sans mb-8">
+                {selectedProject.description}
+              </p>
+
+              {/* Technologies */}
+              {selectedProject.technologies && selectedProject.technologies.length > 0 && (
+                <div className="mb-8 pb-8 border-b border-border">
+                  <p className="text-sm uppercase tracking-widest text-muted-foreground font-medium font-sans mb-4">
+                    Tech Stack
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {selectedProject.technologies.map((tech: string) => (
+                      <span key={tech} className="text-sm text-foreground border border-border px-4 py-2 font-sans hover:border-foreground transition-colors">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Links Section */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {selectedProject.github_url && (
+                  <a
+                    href={selectedProject.github_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-3 bg-foreground text-background hover:bg-foreground/90 transition-colors px-6 py-4 text-sm uppercase tracking-wide font-medium font-sans"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+                    </svg>
+                    View Repository
+                  </a>
+                )}
+                {selectedProject.live_url && (
+                  <a
+                    href={selectedProject.live_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-3 border-2 border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors px-6 py-4 text-sm uppercase tracking-wide font-medium font-sans"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Live Demo
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }

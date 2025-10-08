@@ -290,6 +290,5 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-if (require.main === module) {
-  main().catch(console.error);
-}
+// Run main if this is the entry point (ES module version)
+main().catch(console.error);
