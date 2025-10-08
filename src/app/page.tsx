@@ -307,6 +307,26 @@ export default function Home() {
         </div>
       </div>
 
+
+
+      {/* Back to Top Button */}
+      <div className="flex justify-center pb-8">
+        <button
+          onClick={() => {
+            // Scroll the whole window first
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Then scroll the content container
+            const container = containerRef.current;
+            if (container) {
+              container.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors font-sans uppercase tracking-wider"
+        >
+          ↑ Back to Top
+        </button>
+      </div>
+
       {/* Clean Floating Chat Button */}
       <FloatingChat />
     </div>
