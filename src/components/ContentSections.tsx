@@ -109,31 +109,25 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
                 {} as Record<string, typeof profileData.skills>,
               ),
             ).map(([category, skills]) => (
-              <div key={category} className="pb-12 border-b border-border last:border-b-0">
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-                  {/* Category Header */}
-                  <div className="lg:col-span-1">
-                    <h3 className="font-serif text-xl font-bold text-foreground mb-4 uppercase tracking-wider">
-                      {category}
-                    </h3>
-                    <div className="w-8 h-px bg-foreground"></div>
-                  </div>
-                  
-                  {/* Skills List */}
-                  <div className="lg:col-span-4">
-                    <div className="space-y-6">
-                      {skills.map((skill) => (
-                        <div
-                          key={skill.id}
-                          className="group flex items-center py-3 border-b border-border/30 hover:border-foreground transition-all duration-300"
-                        >
-                          <span className="font-sans text-lg text-foreground group-hover:font-medium transition-all duration-300">
-                            {skill.name}
-                          </span>
-                        </div>
-                      ))}
+              <div key={category} className="pb-8 mb-8 border-b border-border last:border-b-0">
+                {/* Category Header */}
+                <h3 className="font-serif text-xl font-bold text-foreground mb-6 uppercase tracking-wider">
+                  {category}
+                </h3>
+                
+                {/* Skills Compact Grid */}
+                <div className="flex flex-wrap gap-3">
+                  {skills.map((skill) => (
+                    <div
+                      key={skill.id}
+                      className="group px-4 py-2 border border-border rounded-md bg-background hover:border-foreground transition-all duration-300 cursor-default"
+                      title={`${skill.name}${skill.years_experience ? ` | ${skill.years_experience} years` : ''}${skill.description ? ` | ${skill.description}` : ''}`}
+                    >
+                      <span className="font-sans text-sm text-foreground group-hover:font-medium transition-all duration-300">
+                        {skill.name}
+                      </span>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -235,7 +229,7 @@ function ProjectsGrid({ projects }: { projects: any[] }) {
               {/* Tech Stack Preview */}
               {project.technologies && project.technologies.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {project.technologies.slice(0, 3).map((tech) => (
+                  {project.technologies.slice(0, 3).map((tech: string) => (
                     <span key={tech} className="text-xs text-muted-foreground border border-border px-2 py-1 font-sans">
                       {tech}
                     </span>
