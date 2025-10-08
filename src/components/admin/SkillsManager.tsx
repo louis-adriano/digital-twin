@@ -49,7 +49,6 @@ export default function SkillsManager() {
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
   } = useForm<SkillForm>({
     resolver: zodResolver(skillSchema),
     defaultValues: {
