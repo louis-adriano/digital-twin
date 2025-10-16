@@ -71,7 +71,15 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 User inquiry:', message);
 
-    // STEP 0: Get conversation history for context
+    // STEP 0.5: Detect if user wants to send inquiry/contact Louis
+    const contactKeywords = /\b(contact|email|reach out|get in touch|send message|inquiry|inquire|hire|hiring|job|opportunity|work with|work together|collaborate|collaboration|partnership|consult|consulting|freelance|available|availability|discuss|talk about|interested in working)\b/i;
+    const isContactIntent = contactKeywords.test(message.toLowerCase());
+    
+    if (isContactIntent) {
+      console.log('📧 Contact intent detected - will provide contact guidance');
+    }
+
+    // STEP 1: Get conversation history for context
     let conversationHistory: Array<{role: string, content: string}> = [];
     if (sessionId) {
       try {
@@ -129,8 +137,36 @@ Transform the user's question into 3-5 key search terms that will find the most 
     const optimizedQuery = searchQueryCompletion.choices[0]?.message?.content || message;
     console.log('🎯 Optimized search query:', optimizedQuery);
 
-    // STEP 2: Search vector database with optimized query
-    console.log('📊 Step 2: Searching vector database...');
+    // STEP 2: Get professional profile (always include for contact info)
+    console.log('📊 Step 2: Fetching professional profile...');
+    let profileContext = '';
+    try {
+      const dbClient = getDbClient();
+      await dbClient.connect();
+      const profileResult = await dbClient.query('SELECT * FROM professionals LIMIT 1');
+      await dbClient.end();
+      
+      if (profileResult.rows.length > 0) {
+        const profile = profileResult.rows[0];
+        profileContext = `PROFESSIONAL PROFILE:
+Name: ${profile.name}
+Title: ${profile.title}
+Location: ${profile.location}
+Email: ${profile.email}
+LinkedIn: ${profile.linkedin_url || 'Not provided'}
+GitHub: ${profile.github_url || 'Not provided'}
+Website: ${profile.website_url || 'Not provided'}
+Summary: ${profile.summary}
+
+`;
+        console.log('✅ Profile loaded');
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+
+    // STEP 3: Search vector database with optimized query
+    console.log('� Step 3: Searching vector database...');
     const searchResults = await index.query({
       data: optimizedQuery,
       topK: 5,
@@ -140,8 +176,8 @@ Transform the user's question into 3-5 key search terms that will find the most 
 
     console.log(`📋 Found ${searchResults.length} relevant matches`);
 
-    // STEP 3: Extract relevant context from search results
-    const context = searchResults
+    // STEP 4: Extract relevant context from search results
+    const vectorContext = searchResults
       .filter(result => result.score > 0.6)
       .map(result => {
         // Always prefer the data field which contains the actual content
@@ -169,10 +205,13 @@ Transform the user's question into 3-5 key search terms that will find the most 
       .filter(Boolean)
       .join('\n\n');
 
-    console.log('📝 Step 3: Context prepared for AI');
+    // Combine profile context with vector search results
+    const context = profileContext + (vectorContext ? `\nADDITIONAL INFORMATION:\n${vectorContext}` : '');
 
-    // STEP 4: AI interprets data and responds in human talk
-    console.log('🤖 Step 4: AI generating conversational response...');
+    console.log('📝 Step 4: Context prepared for AI');
+
+    // STEP 5: AI interprets data and responds in human talk
+    console.log('🤖 Step 5: AI generating conversational response...');
     
     // Build conversation messages with history
     const conversationMessages = [
@@ -181,13 +220,61 @@ Transform the user's question into 3-5 key search terms that will find the most 
           content: `You are an AI assistant representing Louis Adriano, a full-stack developer. You should respond professionally about his work and technical background.
 
 CRITICAL GUIDELINES:
+- ALWAYS provide contact information when asked (email, LinkedIn, GitHub, etc.) - this information is in the context below
 - ONLY discuss information provided in the context below
 - If asked about personal details NOT in the context (relationships, sexuality, personal life, family, etc.), respond: "I can only share professional information about Louis's work and technical background."
-- Stay focused on professional topics: work experience, projects, skills, education
+- Stay focused on professional topics: work experience, projects, skills, education, contact information
 - Be helpful and conversational, but stick to the facts provided
 - Don't make up or assume any personal information
 - If you don't know something, say "I don't have that information"
 - Consider previous conversation when responding
+
+CONTACT INQUIRY HANDLING (IMPORTANT - FULLY AUTONOMOUS MODE):
+When someone expresses interest in working with Louis, hiring him, collaborating, or discussing opportunities:
+
+**BE FULLY AUTONOMOUS - Collect info and send email automatically, NO forms or buttons!**
+
+STEP 1 - Acknowledge & Start Collecting:
+- Warmly acknowledge their interest
+- Conversationally gather: name, email, project/need description
+- Be natural: "I'd love to connect you with Louis! What's your name and email? And tell me about your project."
+
+STEP 2 - Track What You Have:
+Monitor the conversation for:
+- ✅ Email address (required)
+- ✅ Name (nice to have, can use "Anonymous" if missing)
+- ✅ Project/need description (what they want)
+
+STEP 3 - When You Have Email + Description:
+Once you have their EMAIL and what they NEED:
+1. Confirm: "Got it! I'm sending this to Louis right now..."
+2. Add this EXACT marker at the end: [AUTO_SEND_INQUIRY]
+3. The system will automatically send the email in the background (user won't see any forms!)
+4. After marker, the system will add a success message to chat
+
+STEP 4 - If Missing Critical Info:
+If you DON'T have email or project description, keep asking naturally:
+- "What's your email so Louis can reach you?"
+- "Tell me more about what you're looking to build/do?"
+
+**IMPORTANT**: You need AT MINIMUM the user's EMAIL and a description of what they need. Name is optional.
+
+Examples:
+
+User: "I want to work with you"
+AI: "That's exciting! I can connect you with Louis right away. What's your email address? And what kind of project or opportunity are you interested in?"
+
+User: "sarah@company.com, need an AI chatbot for customer support"
+AI: "Perfect! I'm sending your inquiry to Louis now - he'll reach out to you at sarah@company.com about your AI chatbot project. [AUTO_SEND_INQUIRY]"
+
+User: "I'm John from TechCorp, john@techcorp.com, looking to hire for a React developer position"
+AI: "Excellent! I've got your details, John. I'm forwarding this job opportunity to Louis right now - he'll respond to john@techcorp.com soon! [AUTO_SEND_INQUIRY]"
+
+Remember: 
+- [AUTO_SEND_INQUIRY] marker = email gets sent automatically in background
+- Only add marker when you have EMAIL + project description
+- User never sees a form, everything happens through conversation
+- After you add the marker, the system will automatically follow up with a success message
 
 Professional context about Louis Adriano:
 ${context}`

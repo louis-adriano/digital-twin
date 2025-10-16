@@ -16,6 +16,14 @@ export default function ChatBot() {
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [sessionLoading, setSessionLoading] = useState(false);
+  const [showNotifyModal, setShowNotifyModal] = useState(false);
+  const [notificationForm, setNotificationForm] = useState({
+    email: '',
+    name: '',
+    inquiryType: 'job-opportunity',
+    message: '',
+  });
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when messages change
@@ -200,6 +208,57 @@ export default function ChatBot() {
     }
   };
 
+  const handleSendNotification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!notificationForm.email || !notificationForm.message) {
+      alert('Please fill in your email and message');
+      return;
+    }
+
+    setIsSendingNotification(true);
+
+    try {
+      // Get conversation context (last 5 messages)
+      const conversationContext = chatMessages
+        .slice(-5)
+        .map(msg => `${msg.role}: ${msg.content}`)
+        .join('\n\n');
+
+      const response = await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          visitor_email: notificationForm.email,
+          visitor_name: notificationForm.name,
+          inquiry_type: notificationForm.inquiryType,
+          message: notificationForm.message,
+          conversation_context: conversationContext,
+          session_id: sessionId,
+        }),
+      });
+
+      if (response.ok) {
+        alert('✅ Your inquiry has been sent! Louis will get back to you soon.');
+        setShowNotifyModal(false);
+        setNotificationForm({
+          email: '',
+          name: '',
+          inquiryType: 'job-opportunity',
+          message: '',
+        });
+      } else {
+        const error = await response.json();
+        alert(`Failed to send inquiry: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error sending notification:', error);
+      alert('Failed to send inquiry. Please try again or email directly.');
+    } finally {
+      setIsSendingNotification(false);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg flex flex-col h-[600px]">
       {/* Chat Header */}
@@ -214,22 +273,32 @@ export default function ChatBot() {
               )}
             </div>
           </div>
-          {chatMessages.length > 0 && (
+          <div className="flex items-center space-x-2">
             <button
-              onClick={() => {
-                setChatMessages([]);
-                if (sessionId) {
-                  localStorage.removeItem(`chat_messages_${sessionId}`);
-                  localStorage.removeItem('chat_session_id');
-                  setSessionId(null);
-                }
-              }}
-              className="text-gray-400 hover:text-gray-600 transition-colors p-1 text-sm"
-              title="Clear conversation"
+              onClick={() => setShowNotifyModal(true)}
+              className="px-3 py-1.5 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 transition-colors flex items-center space-x-1"
+              title="Send work inquiry to Louis"
             >
-              🗑️
+              <span>📧</span>
+              <span>Contact Louis</span>
             </button>
-          )}
+            {chatMessages.length > 0 && (
+              <button
+                onClick={() => {
+                  setChatMessages([]);
+                  if (sessionId) {
+                    localStorage.removeItem(`chat_messages_${sessionId}`);
+                    localStorage.removeItem('chat_session_id');
+                    setSessionId(null);
+                  }
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 text-sm"
+                title="Clear conversation"
+              >
+                🗑️
+              </button>
+            )}
+          </div>
         </div>
       </div>
       
@@ -283,6 +352,109 @@ export default function ChatBot() {
           </button>
         </div>
       </form>
+
+      {/* Notification Modal */}
+      {showNotifyModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold text-gray-900">📧 Send Work Inquiry to Louis</h3>
+              <button
+                onClick={() => setShowNotifyModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-4">
+              Send a direct inquiry to Louis about job opportunities, collaborations, or consulting. 
+              He'll receive an AI-generated summary with your conversation context.
+            </p>
+
+            <form onSubmit={handleSendNotification} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Your Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={notificationForm.email}
+                  onChange={(e) => setNotificationForm({ ...notificationForm, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="your.email@example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  value={notificationForm.name}
+                  onChange={(e) => setNotificationForm({ ...notificationForm, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="John Doe"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Inquiry Type
+                </label>
+                <select
+                  value={notificationForm.inquiryType}
+                  onChange={(e) => setNotificationForm({ ...notificationForm, inquiryType: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="job-opportunity">Job Opportunity</option>
+                  <option value="collaboration">Collaboration</option>
+                  <option value="consulting">Consulting</option>
+                  <option value="speaking">Speaking Engagement</option>
+                  <option value="general">General Inquiry</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Message <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  required
+                  value={notificationForm.message}
+                  onChange={(e) => setNotificationForm({ ...notificationForm, message: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 h-24 resize-none"
+                  placeholder="Tell Louis about your inquiry..."
+                />
+              </div>
+
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowNotifyModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                  disabled={isSendingNotification}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50"
+                  disabled={isSendingNotification}
+                >
+                  {isSendingNotification ? 'Sending...' : 'Send Inquiry'}
+                </button>
+              </div>
+            </form>
+
+            <p className="text-xs text-gray-500 mt-4">
+              💡 Your conversation history with the AI will be included to give Louis context.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

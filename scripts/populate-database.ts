@@ -11,7 +11,7 @@ const professionalData = {
   personal: {
     name: "Louis Adriano",
     email: "louisadriano00@gmail.com",
-    phone: "+61451220381",
+    phone: null, // Phone number removed for privacy
     title: "Full-stack Developer",
     summary: "Full-stack Developer with 1+ years of experience building scalable web applications using Next.js, TypeScript, and React. Delivered AI-powered platforms with 90%+ search accuracy and corporate websites achieving 90+ PageSpeed Insights score. Experienced in vector databases, semantic search, API integration, and cloud deployment.",
     location: "Sydney, New South Wales, Australia",

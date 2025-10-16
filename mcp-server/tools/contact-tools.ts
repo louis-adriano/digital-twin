@@ -99,10 +99,6 @@ export const handleGetContactInfo = async (args: any): Promise<CallToolResult> =
       contactInfo += `📍 **Location:** ${profile.location}\n`;
     }
 
-    if (include_personal && profile.phone) {
-      contactInfo += `📱 **Phone:** ${profile.phone}\n`;
-    }
-
     contactInfo += `\n**Professional Links:**\n`;
     
     if (profile.linkedin_url) {
@@ -384,10 +380,6 @@ export const handleGenerateIntroductionEmail = async (args: any): Promise<CallTo
     emailTemplate += `Best regards,\n`;
     emailTemplate += `${profile.name}\n`;
     emailTemplate += `${profile.email}`;
-
-    if (profile.phone) {
-      emailTemplate += `\n${profile.phone}`;
-    }
 
     return {
       content: [{

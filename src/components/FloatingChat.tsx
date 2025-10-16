@@ -17,6 +17,14 @@ export default function FloatingChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [sessionLoading, setSessionLoading] = useState(false);
+  const [showNotifyModal, setShowNotifyModal] = useState(false);
+  const [notificationForm, setNotificationForm] = useState({
+    email: '',
+    name: '',
+    inquiryType: 'job-opportunity',
+    message: '',
+  });
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -85,6 +93,79 @@ export default function FloatingChat() {
       setSessionLoading(false);
     }
   }, []);
+
+  // Extract contact info from conversation
+  const extractContactInfo = (latestMessage: string, messages: ChatMessage[]) => {
+    const extracted: Partial<typeof notificationForm> = {};
+    
+    // Get ALL messages (both user and AI) for context
+    const allMessages = messages.map(msg => msg.content).join(' ');
+    const userMessages = messages
+      .filter(msg => msg.role === 'user')
+      .map(msg => msg.content)
+      .join(' ');
+    
+    console.log('Extracting info from:', { userMessages, latestMessage });
+    
+    // Extract email (look for email pattern in all messages)
+    const emailMatch = allMessages.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/);
+    if (emailMatch) {
+      extracted.email = emailMatch[0];
+      console.log('Found email:', extracted.email);
+    }
+    
+    // Extract name (look for "I'm [name]", "My name is [name]", or just capitalized names)
+    const namePatterns = [
+      /(?:i'm|i am|my name is|name's|this is|call me)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
+      /^([A-Z][a-z]+)(?:\s+[A-Z][a-z]+)?(?:,|\s+here)/i,
+    ];
+    
+    for (const pattern of namePatterns) {
+      const match = userMessages.match(pattern);
+      if (match) {
+        extracted.name = match[1].trim();
+        console.log('Found name:', extracted.name);
+        break;
+      }
+    }
+    
+    // Determine inquiry type from keywords
+    const lowerMessages = userMessages.toLowerCase();
+    if (lowerMessages.includes('hire') || lowerMessages.includes('hiring') || lowerMessages.includes('job') || lowerMessages.includes('position')) {
+      extracted.inquiryType = 'job-opportunity';
+    } else if (lowerMessages.includes('freelance') || lowerMessages.includes('contract')) {
+      extracted.inquiryType = 'freelance-project';
+    } else if (lowerMessages.includes('collaborate') || lowerMessages.includes('collaboration') || lowerMessages.includes('partnership') || lowerMessages.includes('work together') || lowerMessages.includes('work with')) {
+      extracted.inquiryType = 'collaboration';
+    } else if (lowerMessages.includes('consult') || lowerMessages.includes('consulting') || lowerMessages.includes('advice')) {
+      extracted.inquiryType = 'consulting';
+    }
+    
+    // Extract project description - get the most relevant parts
+    const sentences = userMessages.split(/[.!?]/).map(s => s.trim()).filter(Boolean);
+    const relevantSentences = sentences.filter(sentence => {
+      const lower = sentence.toLowerCase();
+      return lower.includes('project') || lower.includes('build') || 
+             lower.includes('need') || lower.includes('looking for') ||
+             lower.includes('want') || lower.includes('app') ||
+             lower.includes('website') || lower.includes('system');
+    });
+    
+    if (relevantSentences.length > 0) {
+      extracted.message = relevantSentences.join('. ') + '.';
+      console.log('Found message:', extracted.message);
+    } else {
+      // Fallback: use the user's last few messages
+      extracted.message = messages
+        .filter(msg => msg.role === 'user')
+        .slice(-3)
+        .map(msg => msg.content)
+        .join('. ');
+    }
+    
+    console.log('Extracted info:', extracted);
+    return extracted;
+  };
 
   const loadChatHistory = async (sid: string) => {
     try {
@@ -166,15 +247,76 @@ export default function FloatingChat() {
             if (line.startsWith('data: ')) {
               const data = line.slice(6);
               if (data === '[DONE]') {
+                // Check if AI wants to auto-send inquiry
+                const shouldAutoSend = accumulatedContent.includes('[AUTO_SEND_INQUIRY]');
+                const cleanedContent = accumulatedContent.replace('[AUTO_SEND_INQUIRY]', '').trim();
+                
                 setChatMessages(prev => {
                   const filtered = prev.filter(msg => !msg.isTyping);
                   return [...filtered, {
                     id: Date.now() + 2,
-                    content: accumulatedContent,
+                    content: cleanedContent,
                     role: 'assistant' as const,
                     timestamp: new Date(),
                   }];
                 });
+                
+                // Auto-send inquiry in background without showing form
+                if (shouldAutoSend) {
+                  setTimeout(async () => {
+                    try {
+                      // Extract info from conversation
+                      const extractedInfo = extractContactInfo(cleanedContent, chatMessages);
+                      
+                      console.log('Auto-sending inquiry with:', extractedInfo);
+                      
+                      // Get conversation context
+                      const conversationContext = chatMessages
+                        .slice(-10)
+                        .map(msg => `${msg.role}: ${msg.content}`)
+                        .join('\n\n');
+
+                      // Send email automatically in background
+                      const response = await fetch('/api/notify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          visitor_email: extractedInfo.email || 'not-provided@temp.com',
+                          visitor_name: extractedInfo.name || 'Anonymous',
+                          inquiry_type: extractedInfo.inquiryType || 'general',
+                          message: extractedInfo.message || 'Contact inquiry from chat',
+                          conversation_context: conversationContext,
+                          session_id: sessionId,
+                        }),
+                      });
+
+                      if (response.ok) {
+                        // Add a success message to chat
+                        setChatMessages(prev => [...prev, {
+                          id: Date.now() + 100,
+                          content: '✅ Perfect! I\'ve sent your inquiry to Louis. He\'ll get back to you soon at ' + (extractedInfo.email || 'your email') + '!',
+                          role: 'assistant' as const,
+                          timestamp: new Date(),
+                        }]);
+                      } else {
+                        setChatMessages(prev => [...prev, {
+                          id: Date.now() + 100,
+                          content: '⚠️ I had trouble sending the email automatically. Could you try using the Contact button above?',
+                          role: 'assistant' as const,
+                          timestamp: new Date(),
+                        }]);
+                      }
+                    } catch (error) {
+                      console.error('Auto-send error:', error);
+                      setChatMessages(prev => [...prev, {
+                        id: Date.now() + 100,
+                        content: '⚠️ I encountered an issue sending the inquiry. Please use the Contact button to send it manually.',
+                        role: 'assistant' as const,
+                        timestamp: new Date(),
+                      }]);
+                    }
+                  }, 1000);
+                }
                 break;
               }
 
@@ -229,6 +371,57 @@ export default function FloatingChat() {
     }
   };
 
+  const handleSendNotification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!notificationForm.email || !notificationForm.message) {
+      alert('Please fill in your email and message');
+      return;
+    }
+
+    setIsSendingNotification(true);
+
+    try {
+      // Get conversation context (last 5 messages)
+      const conversationContext = chatMessages
+        .slice(-5)
+        .map(msg => `${msg.role}: ${msg.content}`)
+        .join('\n\n');
+
+      const response = await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          visitor_email: notificationForm.email,
+          visitor_name: notificationForm.name,
+          inquiry_type: notificationForm.inquiryType,
+          message: notificationForm.message,
+          conversation_context: conversationContext,
+          session_id: sessionId,
+        }),
+      });
+
+      if (response.ok) {
+        alert('✅ Your inquiry has been sent! Louis will get back to you soon.');
+        setShowNotifyModal(false);
+        setNotificationForm({
+          email: '',
+          name: '',
+          inquiryType: 'job-opportunity',
+          message: '',
+        });
+      } else {
+        const error = await response.json();
+        alert(`Failed to send inquiry: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error sending notification:', error);
+      alert('Failed to send inquiry. Please try again or email directly.');
+    } finally {
+      setIsSendingNotification(false);
+    }
+  };
+
   return (
     <div className="fixed bottom-6 right-6 z-50">
       {/* Large Centered Chat Window */}
@@ -257,7 +450,7 @@ export default function FloatingChat() {
                         setSessionId(null);
                       }
                     }}
-                    className="text-muted-foreground hover:text-foreground transition-colors p-1 text-sm"
+                    className="text-muted-foreground hover:text-foreground transition-colors p-1.5 text-sm"
                     title="Clear conversation"
                   >
                     🗑️
@@ -400,6 +593,133 @@ export default function FloatingChat() {
           </svg>
         )}
       </button>
+
+      {/* Notification Modal */}
+      {showNotifyModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white max-w-lg w-full rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden">
+            <div className="bg-gradient-to-br from-gray-900 to-black p-8 text-white">
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <span className="text-2xl">💬</span>
+                    <h3 className="font-serif text-3xl font-bold">Get in Touch</h3>
+                  </div>
+                  <p className="text-gray-300 font-sans text-sm">Send a direct inquiry to Louis</p>
+                </div>
+                <button
+                  onClick={() => setShowNotifyModal(false)}
+                  className="text-gray-400 hover:text-white transition-colors p-1"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="p-8">
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                <p className="text-sm text-blue-900 font-sans leading-relaxed">
+                  ✨ Louis will receive an AI-generated summary with our conversation context
+                </p>
+              </div>
+
+              <form onSubmit={handleSendNotification} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 font-sans">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={notificationForm.email}
+                    onChange={(e) => setNotificationForm({ ...notificationForm, email: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-sans transition-all"
+                    placeholder="your.email@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 font-sans">
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    value={notificationForm.name}
+                    onChange={(e) => setNotificationForm({ ...notificationForm, name: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-sans transition-all"
+                    placeholder="John Doe"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 font-sans">
+                    Inquiry Type
+                  </label>
+                  <select
+                    value={notificationForm.inquiryType}
+                    onChange={(e) => setNotificationForm({ ...notificationForm, inquiryType: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-sans transition-all"
+                  >
+                    <option value="job-opportunity">💼 Job Opportunity</option>
+                    <option value="collaboration">🤝 Collaboration</option>
+                    <option value="consulting">💡 Consulting</option>
+                    <option value="freelance-project">🚀 Freelance Project</option>
+                    <option value="general">📬 General Inquiry</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 font-sans">
+                    Message <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    required
+                    value={notificationForm.message}
+                    onChange={(e) => setNotificationForm({ ...notificationForm, message: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent h-32 resize-none font-sans transition-all"
+                    placeholder="Tell Louis about your project or inquiry..."
+                  />
+                </div>
+
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowNotifyModal(false)}
+                    className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all font-sans font-semibold rounded-lg"
+                    disabled={isSendingNotification}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 transition-all font-sans font-semibold rounded-lg shadow-lg shadow-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                    disabled={isSendingNotification}
+                  >
+                    {isSendingNotification ? (
+                      <span className="flex items-center justify-center space-x-2">
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Sending...</span>
+                      </span>
+                    ) : 'Send Inquiry'}
+                  </button>
+                </div>
+              </form>
+
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <p className="text-xs text-gray-600 font-sans flex items-start space-x-2">
+                  <span className="text-sm">💡</span>
+                  <span>Your conversation history will be included to provide Louis with full context.</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
