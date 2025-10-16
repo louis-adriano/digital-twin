@@ -431,9 +431,9 @@ export default function FloatingChat() {
             {/* Chat Header */}
             <div className="flex justify-between items-center p-6 border-b border-border bg-card flex-shrink-0">
               <div>
-                <h3 className="font-serif text-2xl font-semibold text-foreground">Ask My Digital Twin</h3>
+                <h3 className="font-serif text-2xl font-semibold text-foreground">Ask Cloud</h3>
                 <div className="flex items-center space-x-2 mt-1">
-                  <p className="text-sm text-muted-foreground font-sans">Chat with AI about my background</p>
+                  <p className="text-sm text-muted-foreground font-sans">Chat with AI about Louis' work</p>
                   {sessionId && (
                     <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Connected</span>
                   )}
@@ -479,16 +479,16 @@ export default function FloatingChat() {
                     <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl">👋</span>
                     </div>
-                    <h4 className="font-serif text-xl text-foreground mb-2">Hello! I&apos;m Louis&apos;s Digital Twin</h4>
-                    <p className="text-muted-foreground font-sans">Ask me anything about my experience, skills, or projects!</p>
+                    <h4 className="font-serif text-xl text-foreground mb-2">Hello! I&apos;m Cloud</h4>
+                    <p className="text-muted-foreground font-sans">Louis&apos; AI assistant - Ask me anything about his experience, skills, or projects!</p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">
                     {[
                       "What's your experience with React?",
                       "Tell me about your AI projects",
-                      "What are your strongest skills?",
-                      "How did you get into web development?"
+                      "I'd like to work with you",
+                      "What are your strongest skills?"
                     ].map((suggestion, index) => (
                       <button
                         key={index}
@@ -516,7 +516,7 @@ export default function FloatingChat() {
                         <div className={`text-[10px] font-medium mb-2 opacity-60 uppercase tracking-wider ${
                           msg.role === 'user' ? 'text-background/70' : 'text-muted-foreground'
                         }`}>
-                          {msg.role === 'user' ? 'You' : 'Digital Twin'}
+                          {msg.role === 'user' ? 'You' : 'Cloud'}
                         </div>
                         <div className="whitespace-pre-wrap leading-relaxed text-sm">
                           {msg.isTyping && !msg.content ? (
