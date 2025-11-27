@@ -441,17 +441,19 @@ export default function FloatingChat() {
         <div className="fixed inset-0 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm z-[100]">
           <div className="w-full max-w-4xl h-[80vh] bg-background border border-border shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-300">
             {/* Chat Header */}
-            <div className="flex justify-between items-center p-6 border-b border-border bg-secondary flex-shrink-0">
+            <div className="flex justify-between items-center px-6 py-5 bg-gradient-to-r from-primary to-[#3d6149] flex-shrink-0">
               <div>
-                <h3 className="font-serif italic text-2xl font-light text-foreground">Ask Cloud</h3>
-                <div className="flex items-center space-x-2 mt-1">
-                  <p className="text-sm text-muted-foreground font-sans">Chat with AI about Louis' work</p>
+                <h3 className="font-serif italic text-xl font-light text-primary-foreground">Ask Cloud</h3>
+                <div className="flex items-center gap-2 mt-1">
                   {sessionId && (
-                    <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded">Connected</span>
+                    <>
+                      <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-lg shadow-green-400/50"></div>
+                      <span className="text-sm text-primary-foreground/80 font-sans">Chat with AI about Louis' work</span>
+                    </>
                   )}
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 {chatMessages.length > 0 && (
                   <button
                     onClick={() => {
@@ -462,17 +464,19 @@ export default function FloatingChat() {
                         setSessionId(null);
                       }
                     }}
-                    className="text-muted-foreground hover:text-foreground transition-colors p-1.5 text-sm"
+                    className="p-2 hover:bg-primary-foreground/10 rounded-lg transition-colors"
                     title="Clear conversation"
                   >
-                    🗑️
+                    <svg className="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
                   </button>
                 )}
                 <button
                   onClick={() => setIsChatOpen(false)}
-                  className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                  className="p-2 hover:bg-primary-foreground/10 rounded-lg transition-colors"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -482,17 +486,17 @@ export default function FloatingChat() {
             {/* Chat Messages */}
             <div 
               ref={chatContainerRef}
-              className="flex-1 p-6 overflow-y-auto bg-background min-h-0"
+              className="flex-1 p-6 overflow-y-auto bg-[#ebe6da] min-h-0"
               style={{ scrollBehavior: 'smooth' }}
             >
               {chatMessages.length === 0 ? (
                 <div className="text-center py-16">
                   <div className="mb-8">
-                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl">👋</span>
+                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-4xl">🤖</span>
                     </div>
-                    <h4 className="font-serif text-xl text-foreground mb-2">Hello! I&apos;m Cloud</h4>
-                    <p className="text-muted-foreground font-sans">Louis&apos; AI assistant - Ask me anything about his experience, skills, or projects!</p>
+                    <h4 className="font-serif italic text-2xl text-foreground mb-2 font-light">Hello! I'm Cloud</h4>
+                    <p className="text-muted-foreground font-sans">Louis' AI assistant - Ask me anything about his experience, skills, or projects!</p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">
@@ -506,10 +510,9 @@ export default function FloatingChat() {
                         key={index}
                         onClick={() => {
                           setInputMessage(suggestion);
-                          // Auto-send the suggestion
                           sendMessage(suggestion);
                         }}
-                        className="p-3 text-left text-sm border border-border hover:border-primary hover:bg-secondary transition-all font-sans rounded-[4px]"
+                        className="p-3 text-left text-sm border border-border hover:border-primary hover:bg-background transition-all font-sans rounded-lg"
                       >
                         {suggestion}
                       </button>
@@ -517,59 +520,60 @@ export default function FloatingChat() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {chatMessages.map((msg, index) => (
                     <div key={msg.id || index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[75%] px-5 py-4 font-sans shadow-sm ${
-                        msg.role === 'user'
-                          ? 'bg-primary text-primary-foreground rounded-[20px] rounded-br-[4px] ml-12'
-                          : 'bg-secondary text-foreground border border-border rounded-[20px] rounded-bl-[4px] mr-12'
-                      }`}>
-                        <div className={`text-[10px] font-medium mb-2 opacity-60 uppercase tracking-wider ${
-                          msg.role === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                        }`}>
-                          {msg.role === 'user' ? 'You' : 'Cloud'}
-                        </div>
-                        <div className="whitespace-pre-wrap leading-relaxed text-sm">
-                          {msg.isTyping && !msg.content ? (
-                            <div className="flex items-center space-x-1">
-                              <div className="flex space-x-1">
-                                <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                                <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-                                <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                      <div className={`max-w-[80%]`}>
+                        {/* Message bubble */}
+                        <div className="flex flex-col gap-1.5">
+                          <div className={`px-4 py-3 rounded-2xl font-sans text-[0.95rem] leading-relaxed shadow-md ${
+                            msg.role === 'user'
+                              ? 'bg-primary text-primary-foreground rounded-br-sm'
+                              : 'bg-background text-foreground rounded-bl-sm'
+                          }`}>
+                            {msg.isTyping && !msg.content ? (
+                              <div className="flex gap-1.5 py-1">
+                                <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: '300ms' }}></div>
                               </div>
-                              <span className="ml-2 opacity-60">Thinking...</span>
-                            </div>
-                          ) : msg.content}
+                            ) : (
+                              <div className="whitespace-pre-wrap">{msg.content}</div>
+                            )}
+                          </div>
+                          <span className={`text-xs text-muted-foreground px-2 font-sans ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                            {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                          </span>
                         </div>
                       </div>
                     </div>
                   ))}
-                  {/* Invisible div to scroll to */}
                   <div ref={messagesEndRef} className="h-1" />
                 </div>
               )}
             </div>
 
             {/* Chat Input */}
-            <div className="p-6 border-t border-border bg-secondary flex-shrink-0">
+            <div className="p-5 border-t border-border bg-background flex-shrink-0">
               <form onSubmit={handleSubmit}>
-                <div className="flex space-x-4">
+                <div className="flex gap-3 items-end">
                   <textarea
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Ask me about my experience, skills, projects, or anything else..."
-                    className="flex-1 px-4 py-3 border border-border rounded-[4px] bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans resize-none"
-                    rows={2}
+                    placeholder="Type your message..."
+                    className="flex-1 px-4 py-3 border border-border rounded-2xl bg-[#ebe6da] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans resize-none"
+                    rows={1}
                     disabled={isLoading}
                   />
                   <button
                     type="submit"
                     disabled={isLoading || !inputMessage.trim()}
-                    className="bg-primary text-primary-foreground hover:bg-[#3d6149] disabled:bg-muted disabled:cursor-not-allowed px-6 py-3 font-sans font-medium transition-colors self-end rounded-[30px]"
+                    className="flex-shrink-0 w-12 h-12 bg-primary text-primary-foreground rounded-full hover:bg-[#3d6149] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100 disabled:hover:shadow-lg"
                   >
-                    {isLoading ? 'Sending...' : 'Send'}
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
                   </button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2 font-sans">Press Enter to send, Shift+Enter for new line</p>
