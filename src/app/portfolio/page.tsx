@@ -13,7 +13,7 @@ export default function Portfolio() {
   const [error, setError] = useState<string | null>(null);
 
   // Refs for sections
-  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
   const sections = [
     { key: "overview", label: "Summary" },
