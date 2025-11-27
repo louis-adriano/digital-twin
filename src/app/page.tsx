@@ -2,6 +2,7 @@ import { ProfileData } from '../types/profile';
 import FloatingChat from '../components/FloatingChat';
 import Link from 'next/link';
 import { ConnectButton } from '../components/ConnectButton';
+import { Client } from 'pg';
 
 // Format date helper
 const formatDate = (dateString: string | null) => {
@@ -12,26 +13,88 @@ const formatDate = (dateString: string | null) => {
   });
 };
 
-// Fetch profile data on the server
+// Fetch profile data directly from database
 async function getProfileData(): Promise<ProfileData | null> {
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+  });
+
   try {
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3001';
+    await client.connect();
     
-    const response = await fetch(`${baseUrl}/api/profile`, {
-      next: { revalidate: 60 } // Revalidate every 60 seconds
-    });
+    const profileResult = await client.query('SELECT * FROM professionals LIMIT 1');
+    if (profileResult.rows.length === 0) return null;
     
-    if (!response.ok) {
-      console.error('Failed to fetch profile:', response.status);
-      return null;
-    }
+    const profile = profileResult.rows[0];
     
-    return await response.json();
+    const [experiencesResult, skillsResult, projectsResult, educationResult] = await Promise.all([
+      client.query(
+        `SELECT * FROM experiences 
+         WHERE professional_id = $1 
+         ORDER BY CASE WHEN end_date IS NULL THEN 0 ELSE 1 END, start_date DESC`,
+        [profile.id]
+      ),
+      client.query('SELECT * FROM skills WHERE professional_id = $1 ORDER BY category, name', [profile.id]),
+      client.query(
+        `SELECT * FROM projects 
+         WHERE professional_id = $1 
+         ORDER BY CASE WHEN end_date IS NULL THEN 0 ELSE 1 END, start_date DESC`,
+        [profile.id]
+      ),
+      client.query('SELECT * FROM education WHERE professional_id = $1 ORDER BY start_date DESC', [profile.id])
+    ]);
+
+    return {
+      profile: {
+        name: profile.name,
+        email: profile.email,
+        title: profile.title,
+        location: profile.location,
+        bio: profile.bio,
+        summary: profile.summary,
+        portfolio_summary: profile.portfolio_summary,
+        hero_subtitle: profile.hero_subtitle,
+        about_greeting: profile.about_greeting,
+        linkedin_url: profile.linkedin_url,
+        github_url: profile.github_url,
+        website_url: profile.website_url,
+        cv_filename: profile.cv_filename,
+      },
+      experiences: experiencesResult.rows.map(exp => ({
+        id: exp.id,
+        title: exp.position,
+        company: exp.company,
+        location: exp.location,
+        start_date: exp.start_date,
+        end_date: exp.end_date,
+        description: exp.description,
+      })),
+      skills: skillsResult.rows,
+      projects: projectsResult.rows.map(proj => ({
+        id: proj.id,
+        name: proj.name,
+        description: proj.description,
+        technologies: proj.technologies || [],
+        github_url: proj.github_url,
+        live_url: proj.live_url,
+        start_date: proj.start_date,
+        end_date: proj.end_date,
+      })),
+      education: educationResult.rows.map(edu => ({
+        id: edu.id,
+        institution: edu.institution,
+        degree: edu.degree,
+        field_of_study: edu.field_of_study,
+        start_date: edu.start_date,
+        end_date: edu.end_date,
+        description: edu.description,
+      })),
+    };
   } catch (error) {
     console.error('Error fetching profile:', error);
     return null;
+  } finally {
+    await client.end();
   }
 }
 

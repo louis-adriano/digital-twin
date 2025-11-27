@@ -2,26 +2,48 @@ import { ProfileData } from '../../types/profile';
 import Link from 'next/link';
 import FloatingChat from '../../components/FloatingChat';
 import { ChatTriggerButton } from '../../components/ChatTriggerButton';
+import { Client } from 'pg';
 
-// Fetch profile data on the server
+// Fetch profile data directly from database
 async function getProfileData(): Promise<ProfileData | null> {
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+  });
+
   try {
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3001';
+    await client.connect();
     
-    const response = await fetch(`${baseUrl}/api/profile`, {
-      next: { revalidate: 60 } // Revalidate every 60 seconds
-    });
+    const profileResult = await client.query('SELECT * FROM professionals LIMIT 1');
+    if (profileResult.rows.length === 0) return null;
     
-    if (!response.ok) {
-      return null;
-    }
-    
-    return await response.json();
+    const profile = profileResult.rows[0];
+
+    return {
+      profile: {
+        name: profile.name,
+        email: profile.email,
+        title: profile.title,
+        location: profile.location,
+        bio: profile.bio,
+        summary: profile.summary,
+        portfolio_summary: profile.portfolio_summary,
+        hero_subtitle: profile.hero_subtitle,
+        about_greeting: profile.about_greeting,
+        linkedin_url: profile.linkedin_url,
+        github_url: profile.github_url,
+        website_url: profile.website_url,
+        cv_filename: profile.cv_filename,
+      },
+      experiences: [],
+      skills: [],
+      projects: [],
+      education: [],
+    };
   } catch (error) {
     console.error('Error fetching profile:', error);
     return null;
+  } finally {
+    await client.end();
   }
 }
 
