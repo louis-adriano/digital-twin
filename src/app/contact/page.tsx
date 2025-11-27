@@ -1,32 +1,32 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import { ProfileData } from '../../types/profile';
 import Link from 'next/link';
 import FloatingChat from '../../components/FloatingChat';
+import { ChatTriggerButton } from '../../components/ChatTriggerButton';
 
-export default function Contact() {
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
+// Fetch profile data on the server
+async function getProfileData(): Promise<ProfileData | null> {
+  try {
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : 'http://localhost:3001';
+    
+    const response = await fetch(`${baseUrl}/api/profile`, {
+      next: { revalidate: 60 } // Revalidate every 60 seconds
+    });
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    return null;
+  }
+}
 
-  // Load profile data
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const response = await fetch('/api/profile');
-        if (response.ok) {
-          const data = await response.json();
-          setProfileData(data);
-        }
-      } catch (error) {
-        console.error('Failed to load profile:', error);
-      } finally {
-        setProfileLoading(false);
-      }
-    };
-
-    loadProfile();
-  }, []);
+export default async function Contact() {
+  const profileData = await getProfileData();
 
   return (
     <div className="min-h-screen bg-background">
@@ -176,15 +176,7 @@ export default function Contact() {
               <p className="text-primary-foreground opacity-85 mb-8 leading-relaxed">
                 Want to learn more about my experience, projects, or skills? My AI assistant knows everything about my work and can answer your questions instantly. It can also contact me directly and relay your message.
               </p>
-              <button
-                onClick={() => {
-                  const chatButton = document.querySelector('[data-chat-trigger]') as HTMLButtonElement;
-                  if (chatButton) chatButton.click();
-                }}
-                className="bg-primary-foreground text-primary px-8 py-4 rounded-[30px] font-semibold text-[0.95rem] transition-all hover:-translate-y-0.5 hover:shadow-lg self-start"
-              >
-                Start a conversation
-              </button>
+              <ChatTriggerButton />
             </div>
           </div>
         </div>

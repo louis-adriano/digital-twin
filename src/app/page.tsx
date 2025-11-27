@@ -1,76 +1,49 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import { ProfileData } from '../types/profile';
 import FloatingChat from '../components/FloatingChat';
 import Link from 'next/link';
+import { ConnectButton } from '../components/ConnectButton';
 
-export default function Home() {
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// Format date helper
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return 'Present';
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short'
+  });
+};
 
-  // Format date helper
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Present';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short'
+// Fetch profile data on the server
+async function getProfileData(): Promise<ProfileData | null> {
+  try {
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : 'http://localhost:3001';
+    
+    const response = await fetch(`${baseUrl}/api/profile`, {
+      next: { revalidate: 60 } // Revalidate every 60 seconds
     });
-  };
+    
+    if (!response.ok) {
+      console.error('Failed to fetch profile:', response.status);
+      return null;
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    return null;
+  }
+}
 
-  // Load profile data
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        setError(null);
-        const response = await fetch('/api/profile');
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `Failed to load profile: ${response.status}`);
-        }
-        const data = await response.json();
-        setProfileData(data);
-      } catch (error) {
-        console.error('Failed to load profile:', error);
-        setError(error instanceof Error ? error.message : 'Failed to load profile');
-      } finally {
-        setProfileLoading(false);
-      }
-    };
+export default async function Home() {
+  const profileData = await getProfileData();
 
-    loadProfile();
-  }, []);
-
-  if (error) {
+  if (!profileData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="text-xl text-destructive mb-4 font-serif">Error Loading Profile</div>
-          <div className="text-muted-foreground mb-4">{error}</div>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-primary text-primary-foreground hover:bg-secondary transition-colors font-sans"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (profileLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="max-w-6xl mx-auto px-8 py-16">
-          <div className="animate-pulse">
-            <div className="h-12 bg-muted rounded w-1/3 mb-4"></div>
-            <div className="h-6 bg-muted rounded w-1/2 mb-12"></div>
-            <div className="space-y-8">
-              <div className="h-64 bg-muted rounded"></div>
-              <div className="h-64 bg-muted rounded"></div>
-            </div>
-          </div>
+          <div className="text-muted-foreground mb-4">Unable to load profile data</div>
         </div>
       </div>
     );
@@ -444,15 +417,7 @@ export default function Home() {
             I'm always open to interesting conversations, collaborations, and new opportunities.
             Whether you want to discuss a project, ask a question, or just say hello, I'd love to hear from you.
           </p>
-          <button
-            onClick={() => {
-              const chatButton = document.querySelector('[data-chat-trigger]') as HTMLButtonElement;
-              if (chatButton) chatButton.click();
-            }}
-            className="bg-primary-foreground text-primary px-10 py-4 rounded-[30px] font-semibold text-[0.95rem] inline-block transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)]"
-          >
-            Start a conversation
-          </button>
+          <ConnectButton />
 
           <div className="flex gap-8 justify-center mt-12">
             {profileData?.profile.linkedin_url && (
