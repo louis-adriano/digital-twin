@@ -10,6 +10,15 @@ export default function Home() {
   const [profileLoading, setProfileLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Format date helper
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'Present';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short'
+    });
+  };
+
   // Load profile data
   useEffect(() => {
     const loadProfile = async () => {
@@ -203,41 +212,47 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 max-w-[1100px] mx-auto">
             {/* Service Cards */}
             <div className="transition-all hover:-translate-y-1">
-              <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center text-xl mb-5 text-primary-foreground">
-                🎨
+              <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5">
+                <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
               </div>
               <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
-                Design & Development
+                Full-Stack Web Development
               </h3>
               <p className="text-foreground opacity-70 leading-[1.7] text-[0.9rem]">
-                Creating beautiful, functional digital experiences from concept to launch.
-                I blend aesthetics with usability to build products people love.
+                Building scalable applications with Next.js, TypeScript, and React. Creating high-performance 
+                platforms with 90+ PageSpeed scores and modern architecture.
               </p>
             </div>
 
             <div className="transition-all hover:-translate-y-1">
-              <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center text-xl mb-5 text-primary-foreground">
-                💡
+              <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5">
+                <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
               </div>
               <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
-                Strategy & Consulting
+                AI Integration & RAG Architecture
               </h3>
               <p className="text-foreground opacity-70 leading-[1.7] text-[0.9rem]">
-                Helping teams navigate complex challenges with user-centered approaches.
-                I bring fresh perspectives and actionable insights to every project.
+                Developing AI-powered systems with RAG architecture and vector databases. 
+                Achieving 90%+ accuracy with semantic search and real-time NLP.
               </p>
             </div>
 
             <div className="transition-all hover:-translate-y-1">
-              <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center text-xl mb-5 text-primary-foreground">
-                ✨
+              <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5">
+                <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                </svg>
               </div>
               <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
-                AI & Data Analysis
+                Cloud Deployment & DevOps
               </h3>
               <p className="text-foreground opacity-70 leading-[1.7] text-[0.9rem]">
-                Leveraging cutting-edge AI and data science to solve real-world problems.
-                I transform complex data into actionable intelligence.
+                Deploying production applications on Vercel and AWS with automated workflows. 
+                Sub-second response times with seamless scalability.
               </p>
             </div>
           </div>
@@ -256,31 +271,67 @@ export default function Home() {
             </h2>
           </div>
 
-          {/* Grid of Featured Projects */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-[1100px] mx-auto mb-12">
-            {profileData?.projects.slice(0, 4).map((project) => (
+          {/* Current Work Badge */}
+          {profileData?.experiences && profileData.experiences
+            .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())[0] && (
+            <div className="max-w-[900px] mx-auto mb-12 p-6 bg-background border-l-4 border-primary">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                <span className="text-xs uppercase tracking-[2px] text-primary font-medium">Currently Working</span>
+              </div>
+              <h3 className="font-serif italic text-xl font-light text-foreground mb-1">
+                {profileData.experiences.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())[0].title}
+              </h3>
+              <p className="text-sm text-muted-foreground font-sans">
+                {profileData.experiences.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())[0].company} • {formatDate(profileData.experiences.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())[0].start_date)} - Present
+              </p>
+            </div>
+          )}
+
+          {/* Recent Projects */}
+          <div className="max-w-[900px] mx-auto space-y-6 mb-12">
+            {profileData?.projects
+              .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())
+              .slice(0, 2)
+              .map((project, index) => (
               <div
                 key={project.id}
-                className="group transition-all duration-300 hover:-translate-y-1"
+                className="group w-full bg-background border border-border hover:border-primary transition-all duration-300 p-6"
               >
-                {/* Image */}
-                <div className="relative h-[220px] bg-primary overflow-hidden rounded-[4px] mb-5 shadow-[0_15px_50px_rgba(42,42,42,0.12)]">
-                  <div className="absolute inset-0 flex items-center justify-center text-primary-foreground/60 text-[2.5rem]">
-                    🚀
+                <div className="flex items-start gap-6">
+                  {/* Project Number */}
+                  <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center border border-border group-hover:border-primary transition-colors">
+                    <span className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors font-sans">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
                   </div>
-                </div>
 
-                {/* Content */}
-                <div>
-                  <div className="text-[0.65rem] uppercase tracking-[2px] text-primary font-medium mb-2">
-                    Project
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-4 mb-2">
+                      <h3 className="font-serif italic text-lg text-foreground group-hover:text-primary transition-colors font-light">
+                        {project.name}
+                      </h3>
+                      <span className="text-[0.7rem] uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap font-sans">
+                        {formatDate(project.start_date)}
+                      </span>
+                    </div>
+
+                    <p className="text-[0.9rem] text-foreground/70 leading-relaxed mb-4 font-sans">
+                      {project.description}
+                    </p>
+
+                    {/* Technologies */}
+                    {project.technologies && project.technologies.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {project.technologies.slice(0, 5).map((tech: string) => (
+                          <span key={tech} className="text-[0.7rem] px-2 py-1 bg-background border border-border text-foreground/60 font-sans">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-2">
-                    {project.name}
-                  </h3>
-                  <p className="text-[0.9rem] text-foreground opacity-70 leading-[1.6] mb-4 line-clamp-3">
-                    {project.description}
-                  </p>
                 </div>
               </div>
             ))}
