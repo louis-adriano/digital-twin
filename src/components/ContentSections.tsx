@@ -34,22 +34,28 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
   switch (section) {
     case "overview":
       return (
-        <div className="max-w-[900px] mx-auto">
-          <h2 className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-6 font-sans">
-            01 / Summary
-          </h2>
+        <div className="max-w-[900px] mx-auto relative">
+          <div className="inline-block bg-primary px-4 py-1 mb-6">
+            <h2 className="text-xs uppercase tracking-[0.2em] text-primary-foreground font-medium font-sans">
+              01 / Summary
+            </h2>
+          </div>
           <p className="text-[1.1rem] leading-[1.8] text-foreground/90 font-sans">
             {profileData?.profile.portfolio_summary || profileData?.profile.summary}
           </p>
+          <div className="absolute -top-4 -right-8 w-20 h-20 bg-primary/5 rounded-none -z-10"></div>
         </div>
       );
 
     case "experience":
       return (
-        <div className="max-w-[900px] mx-auto">
-          <h2 className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-10 font-sans">
-            02 / Experience
-          </h2>
+        <div className="max-w-[900px] mx-auto relative">
+          <div className="inline-block bg-primary px-4 py-1 mb-10">
+            <h2 className="text-xs uppercase tracking-[0.2em] text-primary-foreground font-medium font-sans">
+              02 / Experience
+            </h2>
+          </div>
+          <div className="absolute top-0 -left-12 w-16 h-16 bg-primary/5 rounded-none -z-10"></div>
 
           <div className="space-y-12">
             {profileData?.experiences.map((exp, index) => (
@@ -99,10 +105,13 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
 
     case "skills":
       return (
-        <div className="max-w-[900px] mx-auto">
-          <h2 className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-10 font-sans">
-            05 / Skills
-          </h2>
+        <div className="max-w-[900px] mx-auto relative">
+          <div className="inline-block bg-primary px-4 py-1 mb-10">
+            <h2 className="text-xs uppercase tracking-[0.2em] text-primary-foreground font-medium font-sans">
+              05 / Skills
+            </h2>
+          </div>
+          <div className="absolute -top-8 -right-16 w-24 h-24 bg-primary/5 rounded-none -z-10"></div>
 
           {profileData?.skills &&
             Object.entries(
@@ -115,22 +124,23 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
                 {} as Record<string, typeof profileData.skills>,
               ),
             ).map(([category, skills]) => (
-              <div key={category} className="mb-8 last:mb-0">
-                <h3 className="text-[0.8rem] font-medium text-foreground mb-4 uppercase tracking-wide font-sans">
-                  {category}
-                </h3>
+              <div key={category} className="mb-10 last:mb-0">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-8 h-[2px] bg-primary"></div>
+                  <h3 className="text-[0.75rem] font-semibold text-primary uppercase tracking-[0.15em] font-sans">
+                    {category}
+                  </h3>
+                </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                <div className="flex flex-wrap gap-2">
                   {skills.map((skill) => (
-                    <div
+                    <span
                       key={skill.id}
-                      className="group px-4 py-2.5 bg-background border border-border hover:border-primary transition-all duration-200 cursor-default"
+                      className="group px-3 py-1.5 bg-background border border-border hover:border-primary hover:bg-primary/5 transition-all duration-200 cursor-default text-[0.8rem] text-foreground/80 font-sans"
                       title={`${skill.name}${skill.years_experience ? ` | ${skill.years_experience} years` : ''}${skill.description ? ` | ${skill.description}` : ''}`}
                     >
-                      <span className="text-[0.85rem] text-foreground/90 font-sans">
-                        {skill.name}
-                      </span>
-                    </div>
+                      {skill.name}
+                    </span>
                   ))}
                 </div>
               </div>
@@ -140,10 +150,13 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
 
     case "education":
       return (
-        <div className="max-w-[900px] mx-auto">
-          <h2 className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-10 font-sans">
-            04 / Education
-          </h2>
+        <div className="max-w-[900px] mx-auto relative">
+          <div className="inline-block bg-primary px-4 py-1 mb-10">
+            <h2 className="text-xs uppercase tracking-[0.2em] text-primary-foreground font-medium font-sans">
+              04 / Education
+            </h2>
+          </div>
+          <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-none -z-10"></div>
 
           <div className="space-y-12">
             {profileData?.education.map((edu) => (
@@ -205,10 +218,13 @@ function ProjectsGrid({ projects }: { projects: any[] }) {
   const [selectedProject, setSelectedProject] = useState<any | null>(null);
 
   return (
-    <div className="max-w-[900px] mx-auto">
-      <h2 className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-10 font-sans">
-        03 / Projects
-      </h2>
+    <div className="max-w-[900px] mx-auto relative">
+      <div className="inline-block bg-primary px-4 py-1 mb-10">
+        <h2 className="text-xs uppercase tracking-[0.2em] text-primary-foreground font-medium font-sans">
+          03 / Projects
+        </h2>
+      </div>
+      <div className="absolute -top-6 right-20 w-16 h-16 bg-primary/5 rounded-none -z-10"></div>
 
       {/* List of Project Cards */}
       <div className="space-y-6">
@@ -290,32 +306,34 @@ function ProjectsGrid({ projects }: { projects: any[] }) {
 
             {/* Project Image */}
             <div className="relative h-64 lg:h-80 bg-primary overflow-hidden border-b border-border">
-              <div className="absolute inset-0 flex items-center justify-center text-primary-foreground/60 text-[5rem]">
-                🚀
+              <div className="absolute inset-0 flex items-center justify-center text-primary-foreground/60">
+                <svg className="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
               </div>
             </div>
 
             {/* Content */}
-            <div className="p-8 lg:p-12">
+            <div className="p-6 lg:p-8">
               {/* Title */}
-              <h3 className="font-serif italic text-3xl lg:text-5xl font-light text-foreground mb-4">
+              <h3 className="font-serif italic text-xl lg:text-2xl font-light text-foreground mb-3">
                 {selectedProject.name}
               </h3>
 
               {/* Description */}
-              <p className="text-base lg:text-xl leading-relaxed text-foreground opacity-70 font-sans mb-8">
+              <p className="text-[0.95rem] leading-relaxed text-foreground/70 font-sans mb-6">
                 {selectedProject.description}
               </p>
 
               {/* Technologies */}
               {selectedProject.technologies && selectedProject.technologies.length > 0 && (
-                <div className="mb-8 pb-8 border-b border-border">
-                  <p className="text-sm uppercase tracking-widest text-muted-foreground font-medium font-sans mb-4">
+                <div className="mb-6 pb-6 border-b border-border">
+                  <p className="text-[0.7rem] uppercase tracking-widest text-muted-foreground font-medium font-sans mb-3">
                     Tech Stack
                   </p>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-2">
                     {selectedProject.technologies.map((tech: string) => (
-                      <span key={tech} className="text-sm text-foreground border border-border px-4 py-2 font-sans hover:border-foreground transition-colors">
+                      <span key={tech} className="text-[0.8rem] text-foreground border border-border px-3 py-1.5 font-sans hover:border-foreground transition-colors">
                         {tech}
                       </span>
                     ))}
@@ -324,15 +342,15 @@ function ProjectsGrid({ projects }: { projects: any[] }) {
               )}
 
               {/* Links Section */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {selectedProject.github_url && (
                   <a
                     href={selectedProject.github_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-3 bg-primary text-primary-foreground hover:bg-[#3d6149] transition-all px-6 py-4 text-sm uppercase tracking-wide font-medium font-sans rounded-[30px]"
+                    className="flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-[#3d6149] transition-all px-5 py-2.5 text-[0.8rem] uppercase tracking-wide font-medium font-sans rounded-[30px]"
                   >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                       <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
                     </svg>
                     View Repository
@@ -343,9 +361,9 @@ function ProjectsGrid({ projects }: { projects: any[] }) {
                     href={selectedProject.live_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-3 border-2 border-foreground text-foreground hover:bg-foreground hover:text-background transition-all px-6 py-4 text-sm uppercase tracking-wide font-medium font-sans rounded-[30px]"
+                    className="flex items-center justify-center gap-2 border-2 border-foreground text-foreground hover:bg-foreground hover:text-background transition-all px-5 py-2.5 text-[0.8rem] uppercase tracking-wide font-medium font-sans rounded-[30px]"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                     Live Demo

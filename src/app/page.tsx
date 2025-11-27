@@ -322,7 +322,7 @@ export default function Home() {
                         {project.name}
                       </h3>
                       <span className="text-[0.7rem] uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap font-sans">
-                        {formatDate(project.start_date)}
+                        {formatDate(project.start_date)} - {project.end_date ? formatDate(project.end_date) : 'Present'}
                       </span>
                     </div>
 
@@ -442,7 +442,7 @@ export default function Home() {
           </h2>
           <p className="text-[1.05rem] leading-[1.8] text-primary-foreground opacity-85 mb-10">
             I'm always open to interesting conversations, collaborations, and new opportunities.
-            Whether you want to discuss a project, ask a question, or just say hello—I'd love to hear from you.
+            Whether you want to discuss a project, ask a question, or just say hello, I'd love to hear from you.
           </p>
           <button
             onClick={() => {
@@ -490,7 +490,16 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-12 px-16 bg-primary text-center border-t-2 border-primary-foreground/20">
         <p className="text-primary-foreground opacity-70 text-[0.9rem]">
-          © 2025 {profileData?.profile.name || "Louis Adriano"}. Designed and built with care.
+          © 2025{' '}
+          <a
+            href="https://www.linkedin.com/in/louisadriano/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-100 transition-opacity underline decoration-primary-foreground/30 hover:decoration-primary-foreground/70"
+          >
+            {profileData?.profile.name || "Louis Adriano"}
+          </a>
+          . Thanks for stopping by
         </p>
       </footer>
     </div>

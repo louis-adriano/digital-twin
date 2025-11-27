@@ -144,13 +144,13 @@ export default function Portfolio() {
       <FloatingChat />
 
       {/* Page Header */}
-      <section className="pt-32 pb-16 px-16 bg-[#f5f1e8]">
-        <div className="max-w-[1300px] mx-auto text-center">
+      <section className="pt-32 pb-16 px-16 bg-[#f5f1e8] relative overflow-hidden">
+        <div className="max-w-[1300px] mx-auto text-center relative z-10">
           <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-6">
             Portfolio
           </div>
           <h1 className="font-serif italic text-[3.5rem] leading-[1.2] font-light text-foreground mb-6">
-            My Work & Experience
+            Work & Experience
           </h1>
           <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 max-w-[650px] mx-auto">
             A comprehensive look at my professional journey, projects, skills, and education.
@@ -186,7 +186,16 @@ export default function Portfolio() {
       {/* Footer */}
       <footer className="py-12 px-16 bg-primary text-center border-t-2 border-primary-foreground/20">
         <p className="text-primary-foreground opacity-70 text-[0.9rem]">
-          © 2025 {profileData?.profile.name || "Louis Adriano"}. Designed and built with care.
+          © 2025{' '}
+          <a
+            href="https://www.linkedin.com/in/louisadriano/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-100 transition-opacity underline decoration-primary-foreground/30 hover:decoration-primary-foreground/70"
+          >
+            {profileData?.profile.name || "Louis Adriano"}
+          </a>
+          . Thanks for stopping by
         </p>
       </footer>
     </div>

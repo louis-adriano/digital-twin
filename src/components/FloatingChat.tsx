@@ -466,7 +466,9 @@ export default function FloatingChat() {
           className="fixed bottom-8 right-8 bg-primary text-primary-foreground w-16 h-16 rounded-full shadow-2xl hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center text-2xl z-50"
           title="Chat with my AI twin"
         >
-          💬
+          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
         </button>
       )}
 
@@ -527,7 +529,9 @@ export default function FloatingChat() {
                 <div className="text-center py-16">
                   <div className="mb-8">
                     <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-4xl">🤖</span>
+                      <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
                     </div>
                     <h4 className="font-serif italic text-2xl text-foreground mb-2 font-light">Hello! I'm Cloud</h4>
                     <p className="text-muted-foreground font-sans">Louis' AI assistant - Ask me anything about his experience, skills, or projects!</p>
@@ -625,7 +629,9 @@ export default function FloatingChat() {
               <div className="flex justify-between items-start">
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
-                    <span className="text-2xl">💬</span>
+                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
                     <h3 className="font-serif italic text-3xl font-light">Get in Touch</h3>
                   </div>
                   <p className="text-primary-foreground opacity-85 font-sans text-sm">Send a direct inquiry to Louis</p>
@@ -685,11 +691,11 @@ export default function FloatingChat() {
                     onChange={(e) => setNotificationForm({ ...notificationForm, inquiryType: e.target.value })}
                     className="w-full px-4 py-3 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans transition-all"
                   >
-                    <option value="job-opportunity">💼 Job Opportunity</option>
-                    <option value="collaboration">🤝 Collaboration</option>
-                    <option value="consulting">💡 Consulting</option>
-                    <option value="freelance-project">🚀 Freelance Project</option>
-                    <option value="general">📬 General Inquiry</option>
+                    <option value="job-opportunity">Job Opportunity</option>
+                    <option value="collaboration">Collaboration</option>
+                    <option value="consulting">Consulting</option>
+                    <option value="freelance-project">Freelance Project</option>
+                    <option value="general">General Inquiry</option>
                   </select>
                 </div>
 

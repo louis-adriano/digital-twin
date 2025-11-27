@@ -71,14 +71,14 @@ export default function Contact() {
 
       {/* Page Header */}
       <section className="pt-32 pb-16 px-16 bg-[#f5f1e8]">
-        <div className="max-w-[1300px] mx-auto">
+        <div className="max-w-[1300px] mx-auto text-center">
           <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-6">
             Contact
           </div>
           <h1 className="font-serif italic text-[3.5rem] leading-[1.2] font-light text-foreground mb-6">
             Let's connect
           </h1>
-          <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 max-w-[650px]">
+          <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 max-w-[650px] mx-auto">
             I'm always open to new opportunities, collaborations, and interesting conversations.
           </p>
         </div>
@@ -167,12 +167,14 @@ export default function Contact() {
 
             {/* Right Column - AI Chat CTA */}
             <div className="bg-primary p-12 rounded-[4px] flex flex-col justify-center">
-              <div className="text-4xl mb-6">💬</div>
+              <svg className="w-12 h-12 text-primary-foreground mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
               <h3 className="font-serif italic text-[2rem] font-light text-primary-foreground mb-4">
-                Chat with my AI twin
+                Chat with my AI Assistant
               </h3>
               <p className="text-primary-foreground opacity-85 mb-8 leading-relaxed">
-                Want to learn more about my experience, projects, or skills? My AI assistant knows everything about my work and can answer your questions instantly.
+                Want to learn more about my experience, projects, or skills? My AI assistant knows everything about my work and can answer your questions instantly. It can also contact me directly and relay your message.
               </p>
               <button
                 onClick={() => {
