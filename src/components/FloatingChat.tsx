@@ -423,19 +423,31 @@ export default function FloatingChat() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <>
+      {/* Floating Chat Button - Fixed bottom right */}
+      {!isChatOpen && (
+        <button
+          data-chat-trigger="true"
+          onClick={() => setIsChatOpen(true)}
+          className="fixed bottom-8 right-8 bg-primary text-primary-foreground w-16 h-16 rounded-full shadow-2xl hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center text-2xl z-50"
+          title="Chat with my AI twin"
+        >
+          💬
+        </button>
+      )}
+
       {/* Large Centered Chat Window */}
       {isChatOpen && (
-        <div className="fixed inset-0 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm z-40">
+        <div className="fixed inset-0 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm z-[100]">
           <div className="w-full max-w-4xl h-[80vh] bg-background border border-border shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-300">
             {/* Chat Header */}
-            <div className="flex justify-between items-center p-6 border-b border-border bg-card flex-shrink-0">
+            <div className="flex justify-between items-center p-6 border-b border-border bg-secondary flex-shrink-0">
               <div>
-                <h3 className="font-serif text-2xl font-semibold text-foreground">Ask Cloud</h3>
+                <h3 className="font-serif italic text-2xl font-light text-foreground">Ask Cloud</h3>
                 <div className="flex items-center space-x-2 mt-1">
                   <p className="text-sm text-muted-foreground font-sans">Chat with AI about Louis' work</p>
                   {sessionId && (
-                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Connected</span>
+                    <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded">Connected</span>
                   )}
                 </div>
               </div>
@@ -497,7 +509,7 @@ export default function FloatingChat() {
                           // Auto-send the suggestion
                           sendMessage(suggestion);
                         }}
-                        className="p-3 text-left text-sm border border-border hover:border-foreground hover:bg-card transition-colors font-sans"
+                        className="p-3 text-left text-sm border border-border hover:border-primary hover:bg-secondary transition-all font-sans rounded-[4px]"
                       >
                         {suggestion}
                       </button>
@@ -509,12 +521,12 @@ export default function FloatingChat() {
                   {chatMessages.map((msg, index) => (
                     <div key={msg.id || index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[75%] px-5 py-4 font-sans shadow-sm ${
-                        msg.role === 'user' 
-                          ? 'bg-foreground text-background rounded-[20px] rounded-br-[4px] ml-12' 
-                          : 'bg-card text-foreground border border-border rounded-[20px] rounded-bl-[4px] mr-12'
+                        msg.role === 'user'
+                          ? 'bg-primary text-primary-foreground rounded-[20px] rounded-br-[4px] ml-12'
+                          : 'bg-secondary text-foreground border border-border rounded-[20px] rounded-bl-[4px] mr-12'
                       }`}>
                         <div className={`text-[10px] font-medium mb-2 opacity-60 uppercase tracking-wider ${
-                          msg.role === 'user' ? 'text-background/70' : 'text-muted-foreground'
+                          msg.role === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
                         }`}>
                           {msg.role === 'user' ? 'You' : 'Cloud'}
                         </div>
@@ -540,7 +552,7 @@ export default function FloatingChat() {
             </div>
 
             {/* Chat Input */}
-            <div className="p-6 border-t border-border bg-card flex-shrink-0">
+            <div className="p-6 border-t border-border bg-secondary flex-shrink-0">
               <form onSubmit={handleSubmit}>
                 <div className="flex space-x-4">
                   <textarea
@@ -548,14 +560,14 @@ export default function FloatingChat() {
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Ask me about my experience, skills, projects, or anything else..."
-                    className="flex-1 px-4 py-3 border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent font-sans resize-none"
+                    className="flex-1 px-4 py-3 border border-border rounded-[4px] bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans resize-none"
                     rows={2}
                     disabled={isLoading}
                   />
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={isLoading || !inputMessage.trim()}
-                    className="bg-foreground text-background hover:bg-secondary disabled:bg-muted disabled:cursor-not-allowed px-6 py-3 font-sans font-medium transition-colors self-end"
+                    className="bg-primary text-primary-foreground hover:bg-[#3d6149] disabled:bg-muted disabled:cursor-not-allowed px-6 py-3 font-sans font-medium transition-colors self-end rounded-[30px]"
                   >
                     {isLoading ? 'Sending...' : 'Send'}
                   </button>
@@ -567,49 +579,22 @@ export default function FloatingChat() {
         </div>
       )}
 
-      {/* Floating Chat Button */}
-      <button
-        onClick={() => setIsChatOpen(!isChatOpen)}
-        className="w-14 h-14 bg-foreground text-background shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
-        style={{ borderRadius: '50%' }}
-      >
-        {isChatOpen ? (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ) : (
-          <svg
-            className="w-6 h-6 transition-transform duration-300 group-hover:scale-110"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-            />
-          </svg>
-        )}
-      </button>
-
       {/* Notification Modal */}
       {showNotifyModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white max-w-lg w-full rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden">
-            <div className="bg-gradient-to-br from-gray-900 to-black p-8 text-white">
+        <div className="fixed inset-0 bg-background/90 backdrop-blur-md flex items-center justify-center z-[110] p-4 animate-in fade-in duration-200">
+          <div className="bg-background max-w-lg w-full border border-border shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden">
+            <div className="bg-primary p-8 text-primary-foreground">
               <div className="flex justify-between items-start">
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
                     <span className="text-2xl">💬</span>
-                    <h3 className="font-serif text-3xl font-bold">Get in Touch</h3>
+                    <h3 className="font-serif italic text-3xl font-light">Get in Touch</h3>
                   </div>
-                  <p className="text-gray-300 font-sans text-sm">Send a direct inquiry to Louis</p>
+                  <p className="text-primary-foreground opacity-85 font-sans text-sm">Send a direct inquiry to Louis</p>
                 </div>
                 <button
                   onClick={() => setShowNotifyModal(false)}
-                  className="text-gray-400 hover:text-white transition-colors p-1"
+                  className="text-primary-foreground opacity-70 hover:opacity-100 transition-colors p-1"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -619,48 +604,48 @@ export default function FloatingChat() {
             </div>
 
             <div className="p-8">
-              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
-                <p className="text-sm text-blue-900 font-sans leading-relaxed">
+              <div className="bg-secondary border-l-4 border-primary p-4 mb-6">
+                <p className="text-sm text-foreground font-sans leading-relaxed opacity-80">
                   ✨ Louis will receive an AI-generated summary with our conversation context
                 </p>
               </div>
 
               <form onSubmit={handleSendNotification} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 font-sans">
-                    Email Address <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-foreground mb-2 font-sans">
+                    Email Address <span className="text-destructive">*</span>
                   </label>
                   <input
                     type="email"
                     required
                     value={notificationForm.email}
                     onChange={(e) => setNotificationForm({ ...notificationForm, email: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-sans transition-all"
+                    className="w-full px-4 py-3 border border-border rounded-[4px] bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans transition-all"
                     placeholder="your.email@example.com"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 font-sans">
+                  <label className="block text-sm font-medium text-foreground mb-2 font-sans">
                     Your Name
                   </label>
                   <input
                     type="text"
                     value={notificationForm.name}
                     onChange={(e) => setNotificationForm({ ...notificationForm, name: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-sans transition-all"
+                    className="w-full px-4 py-3 border border-border rounded-[4px] bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans transition-all"
                     placeholder="John Doe"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 font-sans">
+                  <label className="block text-sm font-medium text-foreground mb-2 font-sans">
                     Inquiry Type
                   </label>
                   <select
                     value={notificationForm.inquiryType}
                     onChange={(e) => setNotificationForm({ ...notificationForm, inquiryType: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-sans transition-all"
+                    className="w-full px-4 py-3 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans transition-all"
                   >
                     <option value="job-opportunity">💼 Job Opportunity</option>
                     <option value="collaboration">🤝 Collaboration</option>
@@ -671,14 +656,14 @@ export default function FloatingChat() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 font-sans">
-                    Message <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-foreground mb-2 font-sans">
+                    Message <span className="text-destructive">*</span>
                   </label>
                   <textarea
                     required
                     value={notificationForm.message}
                     onChange={(e) => setNotificationForm({ ...notificationForm, message: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent h-32 resize-none font-sans transition-all"
+                    className="w-full px-4 py-3 border border-border rounded-[4px] bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent h-32 resize-none font-sans transition-all"
                     placeholder="Tell Louis about your project or inquiry..."
                   />
                 </div>
@@ -687,14 +672,14 @@ export default function FloatingChat() {
                   <button
                     type="button"
                     onClick={() => setShowNotifyModal(false)}
-                    className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all font-sans font-semibold rounded-lg"
+                    className="flex-1 px-6 py-3 border-2 border-foreground text-foreground hover:bg-foreground hover:text-background transition-all font-sans font-medium rounded-[30px]"
                     disabled={isSendingNotification}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 transition-all font-sans font-semibold rounded-lg shadow-lg shadow-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                    className="flex-1 px-6 py-3 bg-primary text-primary-foreground hover:bg-[#3d6149] transition-all font-sans font-medium rounded-[30px] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
                     disabled={isSendingNotification}
                   >
                     {isSendingNotification ? (
@@ -710,8 +695,8 @@ export default function FloatingChat() {
                 </div>
               </form>
 
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-xs text-gray-600 font-sans flex items-start space-x-2">
+              <div className="mt-6 pt-6 border-t border-border">
+                <p className="text-xs text-muted-foreground font-sans flex items-start space-x-2">
                   <span className="text-sm">💡</span>
                   <span>Your conversation history will be included to provide Louis with full context.</span>
                 </p>
@@ -720,6 +705,6 @@ export default function FloatingChat() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

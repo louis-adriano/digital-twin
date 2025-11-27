@@ -10,7 +10,11 @@ const profileUpdateSchema = z.object({
   email: z.string().email('Valid email is required'),
   phone: z.string().optional(),
   title: z.string().optional(),
+  bio: z.string().optional(),
   summary: z.string().optional(),
+  portfolio_summary: z.string().optional(),
+  hero_subtitle: z.string().optional(),
+  about_greeting: z.string().optional(),
   location: z.string().optional(),
   linkedin_url: z.string().url().optional().or(z.literal('')),
   github_url: z.string().url().optional().or(z.literal('')),
@@ -59,10 +63,11 @@ export async function PUT(request: NextRequest) {
 
     // Update profile
     const result = await client.query(
-      `UPDATE professionals SET 
-        name = $1, email = $2, phone = $3, title = $4, 
-        summary = $5, location = $6, linkedin_url = $7, 
-        github_url = $8, website_url = $9, updated_at = CURRENT_TIMESTAMP
+      `UPDATE professionals SET
+        name = $1, email = $2, phone = $3, title = $4,
+        bio = $5, summary = $6, portfolio_summary = $7, hero_subtitle = $8, about_greeting = $9,
+        location = $10, linkedin_url = $11,
+        github_url = $12, website_url = $13, updated_at = CURRENT_TIMESTAMP
       WHERE id = (SELECT id FROM professionals LIMIT 1)
       RETURNING *`,
       [
@@ -70,7 +75,11 @@ export async function PUT(request: NextRequest) {
         validatedData.email,
         validatedData.phone || null,
         validatedData.title || null,
+        validatedData.bio || null,
         validatedData.summary || null,
+        validatedData.portfolio_summary || null,
+        validatedData.hero_subtitle || null,
+        validatedData.about_greeting || null,
         validatedData.location || null,
         validatedData.linkedin_url || null,
         validatedData.github_url || null,

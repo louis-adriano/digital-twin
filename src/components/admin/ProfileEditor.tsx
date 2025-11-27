@@ -9,8 +9,12 @@ const profileSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Valid email is required'),
   phone: z.string().optional(),
-  title: z.string().min(1, 'Professional title is required'), // ✅ Made required since it's displayed on homepage
+  title: z.string().min(1, 'Professional title is required'),
+  bio: z.string().optional(),
   summary: z.string().optional(),
+  portfolio_summary: z.string().optional(),
+  hero_subtitle: z.string().optional(),
+  about_greeting: z.string().optional(),
   location: z.string().optional(),
   linkedin_url: z.string().url().optional().or(z.literal('')),
   github_url: z.string().url().optional().or(z.literal('')),
@@ -48,7 +52,11 @@ export default function ProfileEditor() {
         email: profile.email || '',
         phone: profile.phone || '',
         title: profile.title || '',
+        bio: profile.bio || '',
         summary: profile.summary || '',
+        portfolio_summary: profile.portfolio_summary || '',
+        hero_subtitle: profile.hero_subtitle || '',
+        about_greeting: profile.about_greeting || '',
         location: profile.location || '',
         linkedin_url: profile.linkedin_url || '',
         github_url: profile.github_url || '',
@@ -217,131 +225,182 @@ export default function ProfileEditor() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-sans font-medium text-foreground mb-2">
-              Name * <span className="inline-flex items-center px-2 py-1 text-xs bg-foreground text-background ml-2">HOMEPAGE</span>
+              Name * <span className="inline-flex items-center px-2 py-1 text-xs bg-primary text-primary-foreground rounded ml-2">HOMEPAGE</span>
             </label>
             <input
               {...register('name')}
               type="text"
-              className="w-full px-3 py-2 border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent font-sans"
+              className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
             />
             {errors.name && (
               <p className="mt-1 text-sm text-destructive font-sans">{errors.name.message}</p>
             )}
-            <p className="mt-1 text-xs text-muted-foreground font-sans">Appears as large heading on homepage</p>
+            <p className="mt-1 text-xs text-muted-foreground font-sans">Displayed in hero section and navigation logo</p>
           </div>
 
           <div>
             <label className="block text-sm font-sans font-medium text-foreground mb-2">
-              Email * <span className="inline-flex items-center px-2 py-1 text-xs bg-foreground text-background ml-2">HOMEPAGE</span>
+              Email * <span className="inline-flex items-center px-2 py-1 text-xs bg-primary text-primary-foreground rounded ml-2">HOMEPAGE</span>
             </label>
             <input
               {...register('email')}
               type="email"
-              className="w-full px-3 py-2 border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent font-sans"
+              className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
             />
             {errors.email && (
               <p className="mt-1 text-sm text-destructive font-sans">{errors.email.message}</p>
             )}
-            <p className="mt-1 text-xs text-muted-foreground font-sans">Shows in contact section on homepage</p>
+            <p className="mt-1 text-xs text-muted-foreground font-sans">Shows in Connect section social links</p>
           </div>
 
           <div className="md:col-span-2">
             <label className="block text-sm font-sans font-medium text-foreground mb-2">
-              Professional Title * <span className="inline-flex items-center px-2 py-1 text-xs bg-foreground text-background ml-2">HOMEPAGE</span>
+              Professional Title * <span className="inline-flex items-center px-2 py-1 text-xs bg-primary text-primary-foreground ml-2">HOMEPAGE</span>
             </label>
             <input
               {...register('title')}
               type="text"
               placeholder="e.g. Full-stack Developer & AI Data Analyst"
-              className="w-full px-3 py-2 border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent font-sans"
+              className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
             />
             {errors.title && (
               <p className="mt-1 text-sm text-destructive font-sans">{errors.title.message}</p>
             )}
-            <p className="mt-1 text-xs text-muted-foreground font-sans">Displays directly below your name on homepage</p>
+            <p className="mt-1 text-xs text-muted-foreground font-sans">Displays in the hero description section</p>
           </div>
 
           <div>
             <label className="block text-sm font-sans font-medium text-foreground mb-2">
-              Phone <span className="inline-flex items-center px-2 py-1 text-xs bg-muted text-muted-foreground ml-2">ADMIN ONLY</span>
+              Phone <span className="inline-flex items-center px-2 py-1 text-xs bg-muted text-muted-foreground rounded ml-2">ADMIN ONLY</span>
             </label>
             <input
               {...register('phone')}
               type="tel"
-              className="w-full px-3 py-2 border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent font-sans"
+              className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
             />
             <p className="mt-1 text-xs text-muted-foreground font-sans">For admin records only, not displayed on website</p>
           </div>
 
           <div>
             <label className="block text-sm font-sans font-medium text-foreground mb-2">
-              Location <span className="inline-flex items-center px-2 py-1 text-xs bg-foreground text-background ml-2">HOMEPAGE</span>
+              Location <span className="inline-flex items-center px-2 py-1 text-xs bg-primary text-primary-foreground rounded ml-2">HOMEPAGE</span>
             </label>
             <input
               {...register('location')}
               type="text"
-              className="w-full px-3 py-2 border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent font-sans"
+              className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
             />
-            <p className="mt-1 text-xs text-muted-foreground font-sans">Shows in contact section on homepage</p>
+            <p className="mt-1 text-xs text-muted-foreground font-sans">Not currently displayed (reserved for future use)</p>
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-sans font-medium text-foreground mb-2">
-            Professional Summary <span className="inline-flex items-center px-2 py-1 text-xs bg-foreground text-background ml-2">HOMEPAGE</span>
+            Hero Bio/Tagline <span className="inline-flex items-center px-2 py-1 text-xs bg-primary text-primary-foreground ml-2">HOMEPAGE - HERO</span>
+          </label>
+          <textarea
+            {...register('bio')}
+            rows={2}
+            placeholder="e.g. Building at the intersection of creativity and technology."
+            className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
+          />
+          <p className="mt-1 text-xs text-muted-foreground font-sans">Large italic headline in the hero section (shown in Georgia serif)</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-sans font-medium text-foreground mb-2">
+            Hero Subtitle <span className="inline-flex items-center px-2 py-1 text-xs bg-primary text-primary-foreground ml-2">HOMEPAGE - HERO</span>
+          </label>
+          <textarea
+            {...register('hero_subtitle')}
+            rows={2}
+            placeholder="e.g. I'm Louis Adriano, a Full-stack Developer passionate about creating meaningful digital experiences."
+            className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
+          />
+          <p className="mt-1 text-xs text-muted-foreground font-sans">Subtitle text below the hero bio in the hero section</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-sans font-medium text-foreground mb-2">
+            About Greeting <span className="inline-flex items-center px-2 py-1 text-xs bg-primary text-primary-foreground ml-2">HOMEPAGE - ABOUT</span>
+          </label>
+          <textarea
+            {...register('about_greeting')}
+            rows={2}
+            placeholder="e.g. I warmly welcome you to my corner of the internet."
+            className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
+          />
+          <p className="mt-1 text-xs text-muted-foreground font-sans">Greeting text in the About Me section (appears above the summary)</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-sans font-medium text-foreground mb-2">
+            Homepage Summary <span className="inline-flex items-center px-2 py-1 text-xs bg-primary text-primary-foreground ml-2">HOMEPAGE - ABOUT</span>
           </label>
           <textarea
             {...register('summary')}
             rows={4}
-            className="w-full px-3 py-2 border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent font-sans"
+            className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
           />
-          <p className="mt-1 text-xs text-muted-foreground font-sans">Appears in the &quot;About&quot; section when users click Overview</p>
+          <p className="mt-1 text-xs text-muted-foreground font-sans">Main content in the About Me section on homepage</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-sans font-medium text-foreground mb-2">
+            Portfolio Summary <span className="inline-flex items-center px-2 py-1 text-xs bg-primary text-primary-foreground ml-2">PORTFOLIO PAGE</span>
+          </label>
+          <textarea
+            {...register('portfolio_summary')}
+            rows={4}
+            className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
+          />
+          <p className="mt-1 text-xs text-muted-foreground font-sans">Professional summary displayed on the Portfolio page</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-sm font-sans font-medium text-foreground mb-2">
-              LinkedIn URL <span className="inline-flex items-center px-2 py-1 text-xs bg-foreground text-background ml-2">HOMEPAGE</span>
+              LinkedIn URL <span className="inline-flex items-center px-2 py-1 text-xs bg-primary text-primary-foreground rounded ml-2">HOMEPAGE</span>
             </label>
             <input
               {...register('linkedin_url')}
               type="url"
-              className="w-full px-3 py-2 border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent font-sans"
+              className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
             />
             {errors.linkedin_url && (
               <p className="mt-1 text-sm text-destructive font-sans">{errors.linkedin_url.message}</p>
             )}
-            <p className="mt-1 text-xs text-muted-foreground font-sans">Creates clickable LinkedIn link on homepage</p>
+            <p className="mt-1 text-xs text-muted-foreground font-sans">Shows in Connect section footer</p>
           </div>
 
           <div>
             <label className="block text-sm font-sans font-medium text-foreground mb-2">
-              GitHub URL <span className="inline-flex items-center px-2 py-1 text-xs bg-foreground text-background ml-2">HOMEPAGE</span>
+              GitHub URL <span className="inline-flex items-center px-2 py-1 text-xs bg-primary text-primary-foreground rounded ml-2">HOMEPAGE</span>
             </label>
             <input
               {...register('github_url')}
               type="url"
-              className="w-full px-3 py-2 border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent font-sans"
+              className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
             />
             {errors.github_url && (
               <p className="mt-1 text-sm text-destructive font-sans">{errors.github_url.message}</p>
             )}
-            <p className="mt-1 text-xs text-muted-foreground font-sans">Creates clickable GitHub link on homepage</p>
+            <p className="mt-1 text-xs text-muted-foreground font-sans">Shows in Connect section footer</p>
           </div>
 
           <div>
             <label className="block text-sm font-sans font-medium text-foreground mb-2">
-              Website URL <span className="inline-flex items-center px-2 py-1 text-xs bg-muted text-muted-foreground ml-2">ADMIN ONLY</span>
+              Website URL <span className="inline-flex items-center px-2 py-1 text-xs bg-muted text-muted-foreground rounded ml-2">ADMIN ONLY</span>
             </label>
             <input
               {...register('website_url')}
               type="url"
-              className="w-full px-3 py-2 border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent font-sans"
+              className="w-full px-3 py-2 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
             />
             {errors.website_url && (
               <p className="mt-1 text-sm text-destructive font-sans">{errors.website_url.message}</p>
             )}
-            <p className="mt-1 text-xs text-muted-foreground font-sans">For admin records only, not currently displayed on website</p>
+            <p className="mt-1 text-xs text-muted-foreground font-sans">For admin records only, not displayed</p>
           </div>
         </div>
 
@@ -422,14 +481,14 @@ export default function ProfileEditor() {
           <button
             type="button"
             onClick={loadProfile}
-            className="px-4 py-2 text-foreground bg-muted hover:bg-secondary transition-colors font-sans"
+            className="px-6 py-2 border-2 border-foreground text-foreground hover:bg-foreground hover:text-background transition-all font-sans rounded-[30px]"
           >
             Reset
           </button>
           <button
             type="submit"
             disabled={saving || !isDirty}
-            className="px-6 py-2 bg-foreground text-background hover:bg-secondary disabled:bg-muted disabled:cursor-not-allowed transition-colors font-sans"
+            className="px-8 py-2 bg-primary text-primary-foreground hover:bg-[#3d6149] disabled:bg-muted disabled:cursor-not-allowed transition-all font-sans rounded-[30px]"
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>

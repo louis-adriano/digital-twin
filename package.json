@@ -7,14 +7,11 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
+    "type-check": "tsc --noEmit",
     "setup": "tsx scripts/setup.ts",
     "db:schema": "tsx scripts/create-schema.ts",
-    "db:populate": "tsx scripts/populate-database.ts",
-    "type-check": "tsc --noEmit",
-    "mcp:install": "tsx scripts/install-mcp.ts",
-    "mcp:start": "cd mcp-server && npm run start",
-    "mcp:test": "cd mcp-server && npm test",
-    "mcp:dev": "cd mcp-server && npm run dev"
+    "db:migrate": "tsx scripts/migrate-to-vector.ts",
+    "mcp:install": "tsx scripts/install-mcp.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

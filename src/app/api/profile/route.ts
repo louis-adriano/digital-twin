@@ -54,9 +54,13 @@ export async function GET() {
       profile: {
         name: profile.name,
         email: profile.email,
-        title: profile.title,  // ✅ Make sure title is included
+        title: profile.title,
         location: profile.location,
-        bio: profile.summary,
+        bio: profile.bio,
+        summary: profile.summary,
+        portfolio_summary: profile.portfolio_summary,
+        hero_subtitle: profile.hero_subtitle,
+        about_greeting: profile.about_greeting,
         linkedin_url: profile.linkedin_url,
         github_url: profile.github_url,
         website_url: profile.website_url,

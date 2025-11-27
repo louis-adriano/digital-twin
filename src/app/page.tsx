@@ -1,27 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { ProfileData } from '../types/profile';
 import FloatingChat from '../components/FloatingChat';
-import ContentSections from '../components/ContentSections';
+import Link from 'next/link';
 
 export default function Home() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState('overview');
   const [error, setError] = useState<string | null>(null);
-  
-  // Refs for sections
-  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  const sections = [
-    { key: "overview", label: "Overview" },
-    { key: "experience", label: "Experience" },
-    { key: "projects", label: "Projects" },
-    { key: "skills", label: "Skills" },
-    { key: "education", label: "Education" },
-  ];
 
   // Load profile data
   useEffect(() => {
@@ -46,113 +33,14 @@ export default function Home() {
     loadProfile();
   }, []);
 
-  // Smooth scroll to section
-  const scrollToSection = useCallback((sectionKey: string) => {
-    const section = sectionRefs.current[sectionKey];
-    if (section) {
-      setActiveSection(sectionKey);
-      section.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }
-  }, []);
-
-  // Intersection Observer to detect which section is in view
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    // Small delay to ensure refs are mounted
-    const timer = setTimeout(() => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          // Sort entries by their position in the viewport
-          const visibleEntries = entries.filter(entry => entry.isIntersecting);
-          
-          if (visibleEntries.length === 0) return;
-
-          // Find the section that's most centered in the viewport
-          let bestEntry = visibleEntries[0];
-          let bestDistance = Infinity;
-
-          visibleEntries.forEach((entry) => {
-            const rect = entry.boundingClientRect;
-            const containerRect = entry.rootBounds;
-            
-            if (containerRect) {
-              // Calculate distance from center of viewport
-              const elementCenter = rect.top + rect.height / 2;
-              const viewportCenter = containerRect.height / 2;
-              const distance = Math.abs(elementCenter - viewportCenter);
-              
-              if (distance < bestDistance) {
-                bestDistance = distance;
-                bestEntry = entry;
-              }
-            }
-          });
-
-          if (bestEntry) {
-            const sectionKey = bestEntry.target.getAttribute('data-section');
-            if (sectionKey && sectionKey !== activeSection) {
-              setActiveSection(sectionKey);
-            }
-          }
-        },
-        {
-          root: container,
-          threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-          rootMargin: '-20% 0px -20% 0px'
-        }
-      );
-
-      // Observe all sections
-      Object.values(sectionRefs.current).forEach((ref) => {
-        if (ref) observer.observe(ref);
-      });
-
-      return () => observer.disconnect();
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [profileData, activeSection]);
-
-  // Keyboard navigation for quick jumping
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const currentIndex = sections.findIndex(s => s.key === activeSection);
-      
-      if (e.key === 'ArrowDown' && currentIndex < sections.length - 1) {
-        e.preventDefault();
-        scrollToSection(sections[currentIndex + 1].key);
-      } else if (e.key === 'ArrowUp' && currentIndex > 0) {
-        e.preventDefault();
-        scrollToSection(sections[currentIndex - 1].key);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeSection, scrollToSection, sections]);
-
-  // Format date helper
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Present';
-    return new Date(dateString).toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short' 
-    });
-  };
-
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="text-xl text-destructive mb-4 font-serif">Error Loading Profile</div>
           <div className="text-muted-foreground mb-4">{error}</div>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="px-6 py-2 bg-primary text-primary-foreground hover:bg-secondary transition-colors font-sans"
           >
             Retry
@@ -172,7 +60,6 @@ export default function Home() {
             <div className="space-y-8">
               <div className="h-64 bg-muted rounded"></div>
               <div className="h-64 bg-muted rounded"></div>
-              <div className="h-64 bg-muted rounded"></div>
             </div>
           </div>
         </div>
@@ -182,153 +69,370 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Fixed Navigation */}
+      <nav className="fixed top-0 w-full px-16 py-8 z-50 bg-gradient-to-b from-[#f5f1e8]/98 to-[#f5f1e8]/0">
+        <div className="flex justify-between items-center">
+          <Link href="/" className="font-serif text-2xl italic font-light tracking-wide text-foreground">
+            {profileData?.profile.name || "Louis Adriano"}
+          </Link>
+
+          <ul className="hidden lg:flex gap-12 absolute left-1/2 transform -translate-x-1/2">
+            <li>
+              <Link href="/" className="font-sans text-[0.95rem] font-normal text-primary">
+                Overview
+              </Link>
+            </li>
+            <li>
+              <Link href="/portfolio" className="font-sans text-[0.95rem] font-normal text-foreground hover:text-primary transition-colors">
+                Portfolio
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" className="font-sans text-[0.95rem] font-normal text-foreground hover:text-primary transition-colors">
+                Contact
+              </Link>
+            </li>
+          </ul>
+
+          <a
+            href="/api/cv/download"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-primary text-primary-foreground px-8 py-3 rounded-[30px] font-medium text-[0.95rem] transition-all hover:bg-[#3d6149] hover:-translate-y-0.5"
+          >
+            Download CV
+          </a>
+        </div>
+      </nav>
+
+      {/* Floating Chat Button */}
+      <FloatingChat />
+
       {/* Hero Section */}
-      <div className="relative">
-        <div className="px-8 py-20 lg:px-16 lg:py-32">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
-              {/* Large Name Display */}
-              <div className="lg:col-span-8">
-                <h1 className="font-serif text-6xl lg:text-8xl xl:text-9xl font-bold leading-none text-foreground text-balance">
-                  {profileData?.profile.name?.split(" ")[0] || "Louis"}
-                </h1>
-                <h1 className="font-serif text-6xl lg:text-8xl xl:text-9xl font-light leading-none text-muted-foreground text-balance -mt-4">
-                  {profileData?.profile.name?.split(" ")[1] || "Adriano"}
-                </h1>
-                
-                {/* Job Title */}
-                <div className="mt-8 lg:mt-12">
-                  <p className="text-lg lg:text-xl font-sans font-light tracking-wide text-secondary uppercase">
-                    {profileData?.profile.title || "Full-stack Developer & AI Data Analyst"}
+      <section className="min-h-screen flex items-center justify-center px-16 pt-24 pb-16 bg-[#f5f1e8]">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 items-center gap-16">
+        <div className="max-w-[600px] mx-auto lg:mx-0 lg:ml-auto">
+          <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-6">
+            Welcome
+          </div>
+          <h1 className="font-serif italic text-[3.2rem] leading-[1.2] font-light text-foreground mb-6">
+            {profileData?.profile.bio || "Building at the intersection of creativity and technology."}
+          </h1>
+          <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 mb-10">
+            {profileData?.profile.hero_subtitle || `I'm ${profileData?.profile.name || "Louis Adriano"}, a ${profileData?.profile.title || "Full-stack Developer"} passionate about creating meaningful digital experiences.`}
+          </p>
+          <div className="flex gap-6">
+            <Link
+              href="/portfolio"
+              className="bg-primary text-primary-foreground px-8 py-[0.9rem] rounded-[30px] font-medium text-[0.95rem] transition-all hover:bg-[#3d6149] hover:-translate-y-0.5"
+            >
+              View my work
+            </Link>
+            <Link
+              href="/contact"
+              className="border-2 border-foreground text-foreground px-8 py-[0.8rem] rounded-[30px] font-medium text-[0.95rem] transition-all hover:bg-foreground hover:text-background hover:-translate-y-0.5"
+            >
+              Get in touch
+            </Link>
+          </div>
+        </div>
+
+        <div className="relative h-[550px] flex items-center justify-center mx-auto lg:mx-0 lg:mr-auto">
+          <div className="relative w-[350px] h-[440px] bg-primary rounded-none shadow-[0_15px_50px_rgba(42,42,42,0.12)] overflow-visible">
+            <img 
+              src="/images/hero.jpg" 
+              alt={profileData?.profile.name || "Louis Adriano"}
+              className="w-full h-full object-cover"
+            />
+            {/* Top right decorative rectangle */}
+            <div className="absolute top-8 -right-20 bg-primary px-6 py-2">
+              <span className="text-primary-foreground font-serif italic text-sm font-light tracking-wide">Based in Sydney</span>
+            </div>
+            {/* Bottom left decorative rectangle */}
+            <div className="absolute bottom-8 -left-12 bg-primary px-4 py-2">
+              <span className="text-primary-foreground font-serif italic text-xs font-light tracking-wide">Let's Connect!</span>
+            </div>
+          </div>
+        </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="py-32 px-16 bg-[#ebe6da]">
+        <div className="max-w-[1300px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+            <div className="relative h-[450px]">
+              <div className="w-full h-full bg-primary rounded-none shadow-[0_15px_50px_rgba(42,42,42,0.12)] overflow-hidden">
+                <img 
+                  src="/images/about.jpg" 
+                  alt={`About ${profileData?.profile.name || "Louis Adriano"}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <div className="max-w-[650px]">
+              <div className="bg-primary px-16 py-0.5 mb-10 inline-block">
+                <h2 className="font-serif italic text-[2.2rem] font-light text-primary-foreground m-0">
+                  About Me
+                </h2>
+              </div>
+              <p className="text-[1.05rem] leading-[1.9] text-foreground opacity-80 mb-6">
+                {profileData?.profile.about_greeting || "I warmly welcome you to my corner of the internet."}
+              </p>
+              <p className="text-[1.05rem] leading-[1.9] text-foreground opacity-80">
+                {profileData?.profile.summary || "I'm passionate about technology and spend my days building digital solutions. My journey has taken me through various projects and challenges, shaping how I approach problems and create solutions today."}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Expertise Section */}
+      <section className="py-32 px-16 bg-[#f5f1e8]">
+        <div className="max-w-[1300px] mx-auto">
+          <div className="text-center mb-20">
+            <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-3">
+              Expertise
+            </div>
+            <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
+              What I do
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 max-w-[1100px] mx-auto">
+            {/* Service Cards */}
+            <div className="transition-all hover:-translate-y-1">
+              <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center text-xl mb-5 text-primary-foreground">
+                🎨
+              </div>
+              <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
+                Design & Development
+              </h3>
+              <p className="text-foreground opacity-70 leading-[1.7] text-[0.9rem]">
+                Creating beautiful, functional digital experiences from concept to launch.
+                I blend aesthetics with usability to build products people love.
+              </p>
+            </div>
+
+            <div className="transition-all hover:-translate-y-1">
+              <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center text-xl mb-5 text-primary-foreground">
+                💡
+              </div>
+              <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
+                Strategy & Consulting
+              </h3>
+              <p className="text-foreground opacity-70 leading-[1.7] text-[0.9rem]">
+                Helping teams navigate complex challenges with user-centered approaches.
+                I bring fresh perspectives and actionable insights to every project.
+              </p>
+            </div>
+
+            <div className="transition-all hover:-translate-y-1">
+              <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center text-xl mb-5 text-primary-foreground">
+                ✨
+              </div>
+              <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
+                AI & Data Analysis
+              </h3>
+              <p className="text-foreground opacity-70 leading-[1.7] text-[0.9rem]">
+                Leveraging cutting-edge AI and data science to solve real-world problems.
+                I transform complex data into actionable intelligence.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Projects Section */}
+      <section className="py-32 px-16 bg-[#ebe6da]">
+        <div className="max-w-[1300px] mx-auto">
+          <div className="text-center mb-20">
+            <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-3">
+              Portfolio
+            </div>
+            <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
+              Selected work
+            </h2>
+          </div>
+
+          {/* Grid of Featured Projects */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-[1100px] mx-auto mb-12">
+            {profileData?.projects.slice(0, 4).map((project) => (
+              <div
+                key={project.id}
+                className="group transition-all duration-300 hover:-translate-y-1"
+              >
+                {/* Image */}
+                <div className="relative h-[220px] bg-primary overflow-hidden rounded-[4px] mb-5 shadow-[0_15px_50px_rgba(42,42,42,0.12)]">
+                  <div className="absolute inset-0 flex items-center justify-center text-primary-foreground/60 text-[2.5rem]">
+                    🚀
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div>
+                  <div className="text-[0.65rem] uppercase tracking-[2px] text-primary font-medium mb-2">
+                    Project
+                  </div>
+                  <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-2">
+                    {project.name}
+                  </h3>
+                  <p className="text-[0.9rem] text-foreground opacity-70 leading-[1.6] mb-4 line-clamp-3">
+                    {project.description}
                   </p>
                 </div>
               </div>
+            ))}
+          </div>
 
-              {/* Contact Info */}
-              <div className="lg:col-span-4 space-y-4">
-                <div className="text-right">
-                  <p className="text-sm uppercase tracking-widest text-muted-foreground mb-2 font-sans">Contact</p>
-                  <p className="text-foreground font-sans">{profileData?.profile.email}</p>
-                  <p className="text-muted-foreground font-sans">{profileData?.profile.location}</p>
-                </div>
-                <div className="flex justify-end space-x-6 pt-4">
-                  {profileData?.profile.linkedin_url && (
-                    <a
-                      href={profileData.profile.linkedin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-foreground hover:text-muted-foreground transition-colors text-sm uppercase tracking-wide font-sans"
-                    >
-                      LinkedIn
-                    </a>
-                  )}
-                  {profileData?.profile.github_url && (
-                    <a
-                      href={profileData.profile.github_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-foreground hover:text-muted-foreground transition-colors text-sm uppercase tracking-wide font-sans"
-                    >
-                      GitHub
-                    </a>
-                  )}
-                  {profileData?.profile.cv_filename && (
-                    <a
-                      href="/api/cv/download"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-foreground hover:text-muted-foreground transition-colors text-sm uppercase tracking-wide font-sans"
-                    >
-                      Download CV
-                    </a>
-                  )}
-                </div>
+          <div className="text-center">
+            <Link
+              href="/portfolio"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-3 rounded-[30px] font-medium text-[0.95rem] transition-all hover:bg-[#3d6149] hover:-translate-y-0.5"
+            >
+              View all projects
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Writing/Blog Section */}
+      <section className="py-32 px-16 bg-[#f5f1e8]">
+        <div className="max-w-[1300px] mx-auto">
+          <div className="text-center mb-20">
+            <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-3">
+              Writing
+            </div>
+            <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
+              Recent thoughts
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-[1100px] mx-auto">
+            {/* Placeholder blog posts - will be dynamic later */}
+            <div className="group transition-all hover:-translate-y-1">
+              <div className="mb-4">
+                <div className="text-xs text-muted-foreground font-sans mb-2">Nov 20, 2025 • 5 min read</div>
+                <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
+                  On building meaningful digital experiences
+                </h3>
+                <p className="text-[0.9rem] text-foreground opacity-70 leading-[1.6] mb-4">
+                  Exploring what it means to create technology that truly serves people, not the other way around...
+                </p>
+                <a
+                  href={profileData?.profile.linkedin_url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary font-medium inline-flex items-center gap-2 transition-all group-hover:gap-4 text-[0.9rem]"
+                >
+                  Read more on LinkedIn →
+                </a>
+              </div>
+            </div>
+
+            <div className="group transition-all hover:-translate-y-1">
+              <div className="mb-4">
+                <div className="text-xs text-muted-foreground font-sans mb-2">Nov 15, 2025 • 4 min read</div>
+                <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
+                  The art of creative problem solving
+                </h3>
+                <p className="text-[0.9rem] text-foreground opacity-70 leading-[1.6] mb-4">
+                  How constraints can actually unlock creativity and lead to better solutions than we initially imagined...
+                </p>
+                <a
+                  href={profileData?.profile.linkedin_url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary font-medium inline-flex items-center gap-2 transition-all group-hover:gap-4 text-[0.9rem]"
+                >
+                  Read more on LinkedIn →
+                </a>
+              </div>
+            </div>
+
+            <div className="group transition-all hover:-translate-y-1">
+              <div className="mb-4">
+                <div className="text-xs text-muted-foreground font-sans mb-2">Nov 10, 2025 • 6 min read</div>
+                <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
+                  Why continuous learning matters
+                </h3>
+                <p className="text-[0.9rem] text-foreground opacity-70 leading-[1.6] mb-4">
+                  In a rapidly evolving field, staying curious and committed to growth isn't optional—it's essential...
+                </p>
+                <a
+                  href={profileData?.profile.linkedin_url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary font-medium inline-flex items-center gap-2 transition-all group-hover:gap-4 text-[0.9rem]"
+                >
+                  Read more on LinkedIn →
+                </a>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Main Content Grid */}
-      <div className="px-8 lg:px-16">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
-            {/* Left Column - Sticky Navigation */}
-            <div className="lg:col-span-3">
-              <nav className="sticky top-8">
-                <p className="text-sm uppercase tracking-widest text-muted-foreground mb-8 font-medium font-sans">Sections</p>
-                <div className="space-y-4">
-                  {sections.map((section) => (
-                    <button
-                      key={section.key}
-                      onClick={() => scrollToSection(section.key)}
-                      className={`block text-left transition-all duration-500 ease-out font-sans ${
-                        activeSection === section.key
-                          ? "text-foreground font-medium border-l-4 border-foreground pl-6 text-xl transform scale-105"
-                          : "text-muted-foreground hover:text-foreground hover:pl-2 text-lg hover:transform hover:scale-102"
-                      }`}
-                    >
-                      {section.label}
-                    </button>
-                  ))}
-                </div>
-              </nav>
-            </div>
+      {/* Connect Section */}
+      <section className="py-32 px-16 bg-primary text-center">
+        <div className="max-w-[700px] mx-auto">
+          <h2 className="font-serif italic text-[2.8rem] font-light text-primary-foreground mb-6">
+            Let's create something together
+          </h2>
+          <p className="text-[1.05rem] leading-[1.8] text-primary-foreground opacity-85 mb-10">
+            I'm always open to interesting conversations, collaborations, and new opportunities.
+            Whether you want to discuss a project, ask a question, or just say hello—I'd love to hear from you.
+          </p>
+          <button
+            onClick={() => {
+              const chatButton = document.querySelector('[data-chat-trigger]') as HTMLButtonElement;
+              if (chatButton) chatButton.click();
+            }}
+            className="bg-primary-foreground text-primary px-10 py-4 rounded-[30px] font-semibold text-[0.95rem] inline-block transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)]"
+          >
+            Start a conversation
+          </button>
 
-            {/* Right Column - Continuous Scroll Content */}
-            <div className="lg:col-span-9">
-              <div 
-                ref={containerRef}
-                className="h-screen overflow-y-auto scrollbar-hide"
-                style={{ scrollBehavior: 'smooth' }}
+          <div className="flex gap-8 justify-center mt-12">
+            {profileData?.profile.linkedin_url && (
+              <a
+                href={profileData.profile.linkedin_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-foreground opacity-85 hover:opacity-100 text-[0.95rem] font-medium transition-all hover:-translate-y-0.5"
               >
-                <div className="space-y-16">
-                  {sections.map((section) => (
-                    <div
-                      key={section.key}
-                      ref={(el) => {
-                        sectionRefs.current[section.key] = el;
-                      }}
-                      data-section={section.key}
-                      className="py-8 min-h-[60vh]"
-                    >
-                      <ContentSections 
-                        activeSection={section.key}
-                        profileData={profileData} 
-                        formatDate={formatDate}
-                        singleSection={true}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+                LinkedIn
+              </a>
+            )}
+            {profileData?.profile.github_url && (
+              <a
+                href={profileData.profile.github_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-foreground opacity-85 hover:opacity-100 text-[0.95rem] font-medium transition-all hover:-translate-y-0.5"
+              >
+                GitHub
+              </a>
+            )}
+            {profileData?.profile.email && (
+              <a
+                href={`mailto:${profileData.profile.email}`}
+                className="text-primary-foreground opacity-85 hover:opacity-100 text-[0.95rem] font-medium transition-all hover:-translate-y-0.5"
+              >
+                Email
+              </a>
+            )}
           </div>
         </div>
-      </div>
+      </section>
 
-
-
-      {/* Back to Top Button */}
-      <div className="flex justify-center pb-8">
-        <button
-          onClick={() => {
-            // Scroll the whole window first
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            // Then scroll the content container
-            const container = containerRef.current;
-            if (container) {
-              container.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-          }}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors font-sans uppercase tracking-wider"
-        >
-          ↑ Back to Top
-        </button>
-      </div>
-
-      {/* Clean Floating Chat Button */}
-      <FloatingChat />
+      {/* Footer */}
+      <footer className="py-12 px-16 bg-primary text-center border-t-2 border-primary-foreground/20">
+        <p className="text-primary-foreground opacity-70 text-[0.9rem]">
+          © 2025 {profileData?.profile.name || "Louis Adriano"}. Designed and built with care.
+        </p>
+      </footer>
     </div>
   );
 }

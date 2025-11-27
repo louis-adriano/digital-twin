@@ -6,7 +6,11 @@ export interface ProfileData {
     email: string;
     title?: string;
     location: string;
-    bio: string;
+    bio?: string;
+    summary?: string;
+    portfolio_summary?: string;
+    hero_subtitle?: string;
+    about_greeting?: string;
     linkedin_url?: string;
     github_url?: string;
     website_url?: string;
