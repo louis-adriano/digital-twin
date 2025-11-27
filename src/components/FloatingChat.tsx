@@ -114,18 +114,44 @@ export default function FloatingChat() {
       console.log('Found email:', extracted.email);
     }
     
-    // Extract name (look for "I'm [name]", "My name is [name]", or just capitalized names)
+    // Extract name (look for "I'm [name]", "My name is [name]", or standalone names)
     const namePatterns = [
-      /(?:i'm|i am|my name is|name's|this is|call me)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
-      /^([A-Z][a-z]+)(?:\s+[A-Z][a-z]+)?(?:,|\s+here)/i,
+      /(?:i'm|i am|my name is|name's|this is|call me)\s+([a-z]+(?:\s+[a-z]+)?)/i,
+      /^([a-z]+)(?:\s+[a-z]+)?(?:,|\s+here)/i,
+      /\b([a-z]+\s+[a-z]+)\s*,\s*[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i,
     ];
     
-    for (const pattern of namePatterns) {
-      const match = userMessages.match(pattern);
-      if (match) {
-        extracted.name = match[1].trim();
-        console.log('Found name:', extracted.name);
-        break;
+    // Also check for standalone names (when user just types their name as a message)
+    const individualMessages = messages.filter(msg => msg.role === 'user').map(msg => msg.content.trim());
+    for (const msg of individualMessages) {
+      // Check if message is just a name (2-4 words, letters only, short message)
+      if (msg.length < 50 && /^[a-z]+(\s+[a-z]+){1,3}$/i.test(msg)) {
+        const match = namePatterns[0].exec(userMessages);
+        if (!match) {
+          // This looks like a standalone name
+          extracted.name = msg
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+          console.log('Found standalone name:', extracted.name);
+          break;
+        }
+      }
+    }
+    
+    // Try pattern matching if we haven't found a name yet
+    if (!extracted.name) {
+      for (const pattern of namePatterns) {
+        const match = userMessages.match(pattern);
+        if (match) {
+          // Capitalize each word in the name
+          extracted.name = match[1].trim()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+          console.log('Found name:', extracted.name);
+          break;
+        }
       }
     }
     
@@ -265,13 +291,21 @@ export default function FloatingChat() {
                 if (shouldAutoSend) {
                   setTimeout(async () => {
                     try {
+                      // Get the complete message history including current messages
+                      const allMessages = [...chatMessages, {
+                        id: Date.now() + 2,
+                        content: cleanedContent,
+                        role: 'assistant' as const,
+                        timestamp: new Date(),
+                      }];
+                      
                       // Extract info from conversation
-                      const extractedInfo = extractContactInfo(cleanedContent, chatMessages);
+                      const extractedInfo = extractContactInfo(cleanedContent, allMessages);
                       
                       console.log('Auto-sending inquiry with:', extractedInfo);
                       
                       // Get conversation context
-                      const conversationContext = chatMessages
+                      const conversationContext = allMessages
                         .slice(-10)
                         .map(msg => `${msg.role}: ${msg.content}`)
                         .join('\n\n');

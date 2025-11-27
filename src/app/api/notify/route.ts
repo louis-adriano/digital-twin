@@ -68,14 +68,26 @@ export async function POST(request: NextRequest) {
           role: 'system',
           content: `You are an email composer for professional work inquiries. Generate a clear, structured summary email that Louis Adriano will receive about someone who contacted his Digital Twin AI.
 
-The email should follow this structure:
-1. Brief introduction of who contacted
-2. Type of inquiry (job opportunity, collaboration, consulting, etc.)
-3. Key points from their message
-4. Any relevant conversation context
-5. Recommended action or response priority
+Format the email as follows:
 
-Keep it professional, concise, and actionable. Format in plain text with clear sections.`
+**Contact Summary:**
+• Brief introduction of who contacted (1 line)
+• Type of inquiry: [job opportunity/collaboration/consulting/etc]
+
+**Key Points:**
+• Main point 1 (keep each point to 1-2 sentences max)
+• Main point 2
+• Main point 3 (if applicable)
+
+**Conversation Highlights:**
+• Important detail 1
+• Important detail 2
+
+**Recommended Action:**
+• Priority level: [High/Medium/Low]
+• Suggested next step (1 sentence)
+
+Use bullet points (•) for all lists. Keep each bullet point concise (1-2 sentences maximum). Be professional and actionable.`
         },
         {
           role: 'user',
