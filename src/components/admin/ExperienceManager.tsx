@@ -58,7 +58,15 @@ export default function ExperienceManager() {
       if (!response.ok) throw new Error('Failed to load experiences');
       
       const data = await response.json();
-      setExperiences(data);
+      // Sort by start_date descending, treating null end_date as most recent
+      const sortedData = data.sort((a: Experience, b: Experience) => {
+        // If end_date is null, treat as current (most recent)
+        if (a.end_date === null && b.end_date !== null) return -1;
+        if (a.end_date !== null && b.end_date === null) return 1;
+        // Otherwise sort by start_date descending
+        return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+      });
+      setExperiences(sortedData);
     } catch (error) {
       setMessage({
         type: 'error',

@@ -70,7 +70,17 @@ export default function ProjectsManager() {
       if (!response.ok) throw new Error('Failed to load projects');
       
       const data = await response.json();
-      setProjects(data);
+      // Sort by start_date descending, treating null end_date as most recent
+      const sortedData = data.sort((a: Project, b: Project) => {
+        // If end_date is null, treat as ongoing (most recent)
+        if (a.end_date === null && b.end_date !== null) return -1;
+        if (a.end_date !== null && b.end_date === null) return 1;
+        // Otherwise sort by start_date descending
+        const aDate = a.start_date ? new Date(a.start_date).getTime() : 0;
+        const bDate = b.start_date ? new Date(b.start_date).getTime() : 0;
+        return bDate - aDate;
+      });
+      setProjects(sortedData);
     } catch (error) {
       setMessage({
         type: 'error',

@@ -272,21 +272,30 @@ export default function Home() {
           </div>
 
           {/* Current Work Badge */}
-          {profileData?.experiences && profileData.experiences
-            .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())[0] && (
-            <div className="max-w-[900px] mx-auto mb-12 p-6 bg-background border-l-4 border-primary">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                <span className="text-xs uppercase tracking-[2px] text-primary font-medium">Currently Working</span>
+          {profileData?.experiences && profileData.experiences.length > 0 && (() => {
+            // Sort experiences: null end_date first (current), then by start_date descending
+            const sortedExperiences = [...profileData.experiences].sort((a, b) => {
+              if (a.end_date === null && b.end_date !== null) return -1;
+              if (a.end_date !== null && b.end_date === null) return 1;
+              return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+            });
+            const currentExp = sortedExperiences[0];
+            
+            return (
+              <div className="max-w-[900px] mx-auto mb-12 p-6 bg-background border-l-4 border-primary">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                  <span className="text-xs uppercase tracking-[2px] text-primary font-medium">Currently Working</span>
+                </div>
+                <h3 className="font-serif italic text-xl font-light text-foreground mb-1">
+                  {currentExp.title}
+                </h3>
+                <p className="text-sm text-muted-foreground font-sans">
+                  {currentExp.company} • {formatDate(currentExp.start_date)} - {currentExp.end_date ? formatDate(currentExp.end_date) : 'Present'}
+                </p>
               </div>
-              <h3 className="font-serif italic text-xl font-light text-foreground mb-1">
-                {profileData.experiences.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())[0].title}
-              </h3>
-              <p className="text-sm text-muted-foreground font-sans">
-                {profileData.experiences.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())[0].company} • {formatDate(profileData.experiences.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())[0].start_date)} - Present
-              </p>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Recent Projects */}
           <div className="max-w-[900px] mx-auto space-y-6 mb-12">

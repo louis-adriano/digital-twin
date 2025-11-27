@@ -28,7 +28,11 @@ export async function GET() {
     
     // Get experiences
     const experiencesResult = await client.query(
-      'SELECT * FROM experiences WHERE professional_id = $1 ORDER BY start_date DESC',
+      `SELECT * FROM experiences 
+       WHERE professional_id = $1 
+       ORDER BY 
+         CASE WHEN end_date IS NULL THEN 0 ELSE 1 END,
+         start_date DESC`,
       [profile.id]
     );
 
@@ -40,7 +44,11 @@ export async function GET() {
 
     // Get projects
     const projectsResult = await client.query(
-      'SELECT * FROM projects WHERE professional_id = $1 ORDER BY start_date DESC',
+      `SELECT * FROM projects 
+       WHERE professional_id = $1 
+       ORDER BY 
+         CASE WHEN end_date IS NULL THEN 0 ELSE 1 END,
+         start_date DESC`,
       [profile.id]
     );
 
@@ -95,6 +103,10 @@ export async function GET() {
         end_date: edu.end_date,
         description: edu.description,
       })),
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
     });
   } catch (error) {
     console.error('Database error:', error);
