@@ -34,13 +34,11 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
   switch (section) {
     case "overview":
       return (
-        <div className="max-w-[800px] mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
-              Summary
-            </h2>
-          </div>
-          <p className="text-[1.05rem] leading-[1.9] text-foreground opacity-80 text-center">
+        <div className="max-w-[900px] mx-auto">
+          <h2 className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-6 font-sans">
+            01 / Summary
+          </h2>
+          <p className="text-[1.1rem] leading-[1.8] text-foreground/90 font-sans">
             {profileData?.profile.portfolio_summary || profileData?.profile.summary}
           </p>
         </div>
@@ -48,43 +46,51 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
 
     case "experience":
       return (
-        <div>
-          <div className="text-center mb-12">
-            <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
-              Experience
-            </h2>
-          </div>
+        <div className="max-w-[900px] mx-auto">
+          <h2 className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-10 font-sans">
+            02 / Experience
+          </h2>
 
-          {profileData?.experiences.map((exp) => (
-            <div key={exp.id} className="pb-12 mb-12 border-b border-border last:border-b-0">
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
-                <div className="lg:col-span-1">
-                  <div className="space-y-1">
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground font-medium font-sans">
-                      {formatDate(exp.start_date)}—{formatDate(exp.end_date)}
-                    </p>
-                    {exp.location && (
-                      <p className="text-xs text-muted-foreground font-sans">{exp.location}</p>
-                    )}
+          <div className="space-y-12">
+            {profileData?.experiences.map((exp, index) => (
+              <div key={exp.id} className="group">
+                <div className="flex items-start gap-8">
+                  {/* Timeline dot */}
+                  <div className="flex-shrink-0 mt-1">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
                   </div>
-                </div>
 
-                <div className="lg:col-span-4">
-                  <div className="space-y-3">
-                    <h3 className="font-serif italic text-xl lg:text-2xl font-light text-foreground">
-                      {exp.title}
-                    </h3>
-                    <p className="text-lg text-foreground font-medium font-sans">
-                      {exp.company}
-                    </p>
-                    <p className="text-base leading-relaxed text-foreground opacity-70 font-sans max-w-2xl">
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col lg:flex-row lg:items-baseline lg:justify-between gap-2 mb-3">
+                      <h3 className="font-serif italic text-xl text-foreground font-light">
+                        {exp.title}
+                      </h3>
+                      <span className="text-[0.75rem] uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap font-sans">
+                        {formatDate(exp.start_date)} — {formatDate(exp.end_date)}
+                      </span>
+                    </div>
+                    
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
+                      <p className="text-sm font-medium text-foreground font-sans">
+                        {exp.company}
+                      </p>
+                      {exp.location && (
+                        <>
+                          <span className="text-muted-foreground">•</span>
+                          <p className="text-sm text-muted-foreground font-sans">{exp.location}</p>
+                        </>
+                      )}
+                    </div>
+
+                    <p className="text-[0.95rem] leading-relaxed text-foreground/70 font-sans">
                       {exp.description}
                     </p>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       );
 
@@ -93,12 +99,10 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
 
     case "skills":
       return (
-        <div>
-          <div className="text-center mb-20">
-            <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
-              Skills
-            </h2>
-          </div>
+        <div className="max-w-[900px] mx-auto">
+          <h2 className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-10 font-sans">
+            05 / Skills
+          </h2>
 
           {profileData?.skills &&
             Object.entries(
@@ -111,19 +115,19 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
                 {} as Record<string, typeof profileData.skills>,
               ),
             ).map(([category, skills]) => (
-              <div key={category} className="pb-8 mb-8 border-b border-border last:border-b-0">
-                <h3 className="font-serif italic text-xl font-light text-foreground mb-6 uppercase tracking-wider">
+              <div key={category} className="mb-8 last:mb-0">
+                <h3 className="text-[0.8rem] font-medium text-foreground mb-4 uppercase tracking-wide font-sans">
                   {category}
                 </h3>
 
-                <div className="flex flex-wrap gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {skills.map((skill) => (
                     <div
                       key={skill.id}
-                      className="group px-4 py-2 border border-border rounded-md bg-transparent hover:border-foreground transition-all duration-300 cursor-default"
+                      className="group px-4 py-2.5 bg-background border border-border hover:border-primary transition-all duration-200 cursor-default"
                       title={`${skill.name}${skill.years_experience ? ` | ${skill.years_experience} years` : ''}${skill.description ? ` | ${skill.description}` : ''}`}
                     >
-                      <span className="font-sans text-sm text-foreground group-hover:font-medium transition-all duration-300">
+                      <span className="text-[0.85rem] text-foreground/90 font-sans">
                         {skill.name}
                       </span>
                     </div>
@@ -136,45 +140,52 @@ function renderSection(section: string, profileData: ProfileData | null, formatD
 
     case "education":
       return (
-        <div>
-          <div className="text-center mb-20">
-            <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
-              Education
-            </h2>
-          </div>
+        <div className="max-w-[900px] mx-auto">
+          <h2 className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-10 font-sans">
+            04 / Education
+          </h2>
 
-          {profileData?.education.map((edu) => (
-            <div key={edu.id} className="pb-12 mb-12 border-b border-border last:border-b-0">
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
-                <div className="lg:col-span-1">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground font-medium font-sans">
-                    {formatDate(edu.start_date)}—{formatDate(edu.end_date)}
-                  </p>
-                </div>
+          <div className="space-y-12">
+            {profileData?.education.map((edu) => (
+              <div key={edu.id} className="group">
+                <div className="flex items-start gap-8">
+                  {/* Timeline dot */}
+                  <div className="flex-shrink-0 mt-1">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                  </div>
 
-                <div className="lg:col-span-4">
-                  <div className="space-y-3">
-                    <h3 className="font-serif italic text-xl lg:text-2xl font-light text-foreground">
-                      {edu.degree}
-                    </h3>
-                    <p className="text-lg text-foreground font-medium font-sans">
-                      {edu.institution}
-                    </p>
-                    {edu.field_of_study && (
-                      <p className="text-base text-muted-foreground font-sans">
-                        {edu.field_of_study}
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col lg:flex-row lg:items-baseline lg:justify-between gap-2 mb-3">
+                      <h3 className="font-serif italic text-xl text-foreground font-light">
+                        {edu.degree}
+                      </h3>
+                      <span className="text-[0.75rem] uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap font-sans">
+                        {formatDate(edu.start_date)} — {formatDate(edu.end_date)}
+                      </span>
+                    </div>
+                    
+                    <div className="mb-3">
+                      <p className="text-sm font-medium text-foreground font-sans">
+                        {edu.institution}
                       </p>
-                    )}
+                      {edu.field_of_study && (
+                        <p className="text-sm text-muted-foreground mt-1 font-sans">
+                          {edu.field_of_study}
+                        </p>
+                      )}
+                    </div>
+
                     {edu.description && (
-                      <p className="text-base leading-relaxed text-foreground opacity-70 font-sans max-w-2xl">
+                      <p className="text-[0.95rem] leading-relaxed text-foreground/70 font-sans">
                         {edu.description}
                       </p>
                     )}
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       );
 
@@ -194,44 +205,64 @@ function ProjectsGrid({ projects }: { projects: any[] }) {
   const [selectedProject, setSelectedProject] = useState<any | null>(null);
 
   return (
-    <div>
-      <div className="text-center mb-20">
-        <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
-          Projects
-        </h2>
-      </div>
+    <div className="max-w-[900px] mx-auto">
+      <h2 className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-10 font-sans">
+        03 / Projects
+      </h2>
 
-      {/* Grid of Project Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-[1100px] mx-auto">
-        {projects.map((project) => (
+      {/* List of Project Cards */}
+      <div className="space-y-6">
+        {projects.map((project, index) => (
           <button
             key={project.id}
             onClick={() => setSelectedProject(project)}
-            className="group text-left bg-transparent border-none transition-all duration-300 hover:-translate-y-1"
+            className="group w-full text-left bg-transparent border border-border hover:border-primary transition-all duration-300 p-6"
           >
-            {/* Image with 4px border-radius */}
-            <div className="relative h-[220px] bg-primary overflow-hidden rounded-[4px] mb-5 shadow-[0_15px_50px_rgba(42,42,42,0.12)]">
-              <div className="absolute inset-0 flex items-center justify-center text-primary-foreground/60 text-[2.5rem]">
-                🚀
-              </div>
-            </div>
-
-            {/* Card Content - No padding, transparent */}
-            <div>
-              <div className="text-[0.65rem] uppercase tracking-[2px] text-primary font-medium mb-2">
-                {project.status || "Project"}
+            <div className="flex items-start gap-6">
+              {/* Project Number */}
+              <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center border border-border group-hover:border-primary transition-colors">
+                <span className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors font-sans">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
               </div>
 
-              <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-2">
-                {project.name}
-              </h3>
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-4 mb-2">
+                  <h3 className="font-serif italic text-lg text-foreground group-hover:text-primary transition-colors font-light">
+                    {project.name}
+                  </h3>
+                  <span className="text-[0.7rem] uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap font-sans">
+                    {project.status || "Project"}
+                  </span>
+                </div>
 
-              <p className="text-[0.9rem] text-foreground opacity-70 leading-[1.6] mb-4 line-clamp-3">
-                {project.description}
-              </p>
+                <p className="text-[0.9rem] text-foreground/70 leading-relaxed mb-4 line-clamp-2 font-sans">
+                  {project.description}
+                </p>
 
-              <div className="text-primary font-medium inline-flex items-center gap-2 transition-all group-hover:gap-4">
-                View case study →
+                {/* Technologies */}
+                {project.technologies && project.technologies.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {project.technologies.slice(0, 5).map((tech: string) => (
+                      <span key={tech} className="text-[0.7rem] px-2 py-1 bg-background border border-border text-foreground/60 font-sans">
+                        {tech}
+                      </span>
+                    ))}
+                    {project.technologies.length > 5 && (
+                      <span className="text-[0.7rem] px-2 py-1 text-muted-foreground font-sans">
+                        +{project.technologies.length - 5} more
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Arrow */}
+              <div className="flex-shrink-0 text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </div>
             </div>
           </button>

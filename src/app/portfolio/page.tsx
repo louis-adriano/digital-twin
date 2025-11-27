@@ -167,7 +167,7 @@ export default function Portfolio() {
               sectionRefs.current[section.key] = el;
             }}
             data-section={section.key}
-            className={`py-32 px-16 ${
+            className={`py-16 px-16 ${
               index % 2 === 0 ? "bg-[#ebe6da]" : "bg-[#f5f1e8]"
             }`}
           >
