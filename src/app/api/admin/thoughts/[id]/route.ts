@@ -16,9 +16,10 @@ const thoughtUpdateSchema = z.object({
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const validatedData = thoughtUpdateSchema.parse(body);
 
@@ -40,7 +41,7 @@ export async function PUT(
         validatedData.linkedin_url || null,
         validatedData.published_date,
         validatedData.is_featured || false,
-        params.id,
+        id,
       ]
     );
 
@@ -77,9 +78,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const client = new Client({
       connectionString: process.env.DATABASE_URL,
     });
@@ -88,7 +90,7 @@ export async function DELETE(
 
     const result = await client.query(
       'DELETE FROM thoughts WHERE id = $1 RETURNING *',
-      [params.id]
+      [id]
     );
 
     await client.end();
