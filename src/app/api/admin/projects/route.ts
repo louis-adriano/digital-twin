@@ -4,6 +4,7 @@ config({ path: '.env.local' });
 import { NextRequest, NextResponse } from 'next/server';
 import { Client } from 'pg';
 import { z } from 'zod';
+import { revalidatePath } from 'next/cache';
 
 const projectSchema = z.object({
   name: z.string().min(1, 'Project name is required'),
@@ -89,6 +90,10 @@ export async function POST(request: NextRequest) {
     );
 
     await client.end();
+
+    // Revalidate pages that show projects
+    revalidatePath('/');
+    revalidatePath('/portfolio');
 
     return NextResponse.json({
       success: true,

@@ -4,6 +4,7 @@ config({ path: '.env.local' });
 import { NextRequest, NextResponse } from 'next/server';
 import { Client } from 'pg';
 import { z } from 'zod';
+import { revalidatePath } from 'next/cache';
 
 const projectUpdateSchema = z.object({
   name: z.string().min(1, 'Project name is required'),
@@ -62,6 +63,10 @@ export async function PUT(
       );
     }
 
+    // Revalidate pages
+    revalidatePath('/');
+    revalidatePath('/portfolio');
+
     return NextResponse.json({
       success: true,
       project: result.rows[0],
@@ -105,6 +110,10 @@ export async function DELETE(
         { status: 404 }
       );
     }
+
+    // Revalidate pages
+    revalidatePath('/');
+    revalidatePath('/portfolio');
 
     return NextResponse.json({ success: true });
 

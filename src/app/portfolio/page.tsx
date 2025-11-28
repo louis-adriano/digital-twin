@@ -195,7 +195,7 @@ export default function Portfolio() {
           >
             {profileData?.profile.name || "Louis Adriano"}
           </a>
-          . Thanks for stopping by
+          . Thanks for stopping by! :)
         </p>
       </footer>
     </div>

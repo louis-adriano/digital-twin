@@ -4,6 +4,7 @@ config({ path: '.env.local' });
 import { NextRequest, NextResponse } from 'next/server';
 import { Client } from 'pg';
 import { z } from 'zod';
+import { revalidatePath } from 'next/cache';
 
 const experienceUpdateSchema = z.object({
   company: z.string().min(1, 'Company is required'),
@@ -58,6 +59,10 @@ export async function PUT(
       );
     }
 
+    // Revalidate pages
+    revalidatePath('/');
+    revalidatePath('/portfolio');
+
     return NextResponse.json({
       success: true,
       experience: result.rows[0],
@@ -101,6 +106,10 @@ export async function DELETE(
         { status: 404 }
       );
     }
+
+    // Revalidate pages
+    revalidatePath('/');
+    revalidatePath('/portfolio');
 
     return NextResponse.json({ success: true });
 

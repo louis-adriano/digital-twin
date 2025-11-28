@@ -4,6 +4,7 @@ config({ path: '.env.local' });
 import { NextRequest, NextResponse } from 'next/server';
 import { Client } from 'pg';
 import { z } from 'zod';
+import { revalidatePath } from 'next/cache';
 
 const profileUpdateSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -95,6 +96,11 @@ export async function PUT(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Revalidate all pages that use profile data
+    revalidatePath('/');
+    revalidatePath('/portfolio');
+    revalidatePath('/contact');
 
     return NextResponse.json({
       success: true,

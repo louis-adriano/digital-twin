@@ -527,7 +527,7 @@ export default async function Home() {
           >
             {profileData?.profile.name || "Louis Adriano"}
           </a>
-          . Thanks for stopping by
+          . Thanks for stopping by! :)
         </p>
       </footer>
     </div>

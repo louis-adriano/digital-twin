@@ -3,21 +3,21 @@ config({ path: '.env.local' });
 
 import { NextResponse } from 'next/server';
 import { Client } from 'pg';
-import { readFile } from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
-
-const CV_UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'cv');
 
 export async function GET() {
   try {
+    // If Google Drive URL is set in env, redirect to it
+    if (process.env.GOOGLE_DRIVE_CV_URL) {
+      return NextResponse.redirect(process.env.GOOGLE_DRIVE_CV_URL);
+    }
+
     const client = new Client({
       connectionString: process.env.DATABASE_URL,
     });
 
     await client.connect();
 
-    const result = await client.query('SELECT cv_filename, name FROM professionals LIMIT 1');
+    const result = await client.query('SELECT name FROM professionals LIMIT 1');
     await client.end();
 
     if (result.rows.length === 0) {
@@ -27,46 +27,21 @@ export async function GET() {
       );
     }
 
-    const { cv_filename, name } = result.rows[0];
-
-    if (!cv_filename) {
-      return NextResponse.json(
-        { error: 'No CV file uploaded' },
-        { status: 404 }
-      );
-    }
-
-    const filepath = path.join(CV_UPLOAD_DIR, cv_filename);
-
-    if (!existsSync(filepath)) {
-      return NextResponse.json(
-        { error: 'CV file not found on disk' },
-        { status: 404 }
-      );
-    }
-
-    // Read the file
-    const fileBuffer = await readFile(filepath);
-
-    // Determine file extension and MIME type
-    const fileExtension = cv_filename.split('.').pop()?.toLowerCase();
-    const isDocx = fileExtension === 'docx';
-    const mimeType = isDocx
-      ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      : 'application/pdf';
-
-    // Create a clean filename for download
-    const downloadFilename = `${name.replace(/\s+/g, '_')}_CV.${fileExtension}`;
-
-    // Return the file with appropriate headers
-    return new NextResponse(fileBuffer as unknown as ReadableStream, {
-      status: 200,
-      headers: {
-        'Content-Type': mimeType,
-        'Content-Disposition': `attachment; filename="${downloadFilename}"`,
-        'Content-Length': fileBuffer.length.toString(),
+    return NextResponse.json(
+      { 
+        error: 'CV not configured. Please set GOOGLE_DRIVE_CV_URL in your environment variables.',
+        instructions: [
+          '1. Upload your CV to Google Drive',
+          '2. Right-click the file and select "Share"',
+          '3. Change to "Anyone with the link" can view',
+          '4. Copy the sharing link',
+          '5. Convert it from: https://drive.google.com/file/d/FILE_ID/view?usp=sharing',
+          '6. To: https://drive.google.com/uc?export=download&id=FILE_ID',
+          '7. Add GOOGLE_DRIVE_CV_URL to your .env.local and Vercel environment variables'
+        ]
       },
-    });
+      { status: 404 }
+    );
 
   } catch (error) {
     console.error('CV download error:', error);

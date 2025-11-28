@@ -408,7 +408,37 @@ export default function ProfileEditor() {
         <div className="border-t border-border pt-6">
           <div className="mb-4">
             <h3 className="text-lg font-serif font-semibold text-foreground mb-2">CV/Resume</h3>
-            <p className="text-sm text-muted-foreground font-sans">Upload your CV as a PDF or DOCX file. This will add a download button on your homepage.</p>
+            <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded">
+              <p className="text-sm text-blue-900 font-sans mb-2">
+                <strong>💡 Recommended for Production:</strong> Use Google Drive for hosting your CV.
+              </p>
+              <a 
+                href="https://drive.google.com/drive/folders/10t8jNz3gX75c24Fw_UeIe_ZKCKG-v6Nm?usp=sharing" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800 mb-3"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                Open Google Drive to Upload
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+              <details className="text-xs text-blue-800">
+                <summary className="cursor-pointer font-semibold mb-2">📋 Quick Setup Guide</summary>
+                <ol className="list-decimal list-inside space-y-1 ml-2 mt-2">
+                  <li>Upload your CV to Google Drive</li>
+                  <li>Right-click → Share → "Anyone with the link" → Viewer</li>
+                  <li>Copy the share link</li>
+                  <li>Convert format: <code className="bg-blue-100 px-1 rounded">https://drive.google.com/file/d/FILE_ID/view</code> → <code className="bg-blue-100 px-1 rounded">https://drive.google.com/uc?export=download&id=FILE_ID</code></li>
+                  <li>Add to <code className="bg-blue-100 px-1 rounded">.env.local</code>: <code className="bg-blue-100 px-1 rounded">GOOGLE_DRIVE_CV_URL=YOUR_LINK</code></li>
+                  <li>Add same variable to Vercel environment variables & redeploy</li>
+                </ol>
+              </details>
+            </div>
+            <p className="text-sm text-muted-foreground font-sans">Development uploads work locally but won't deploy to production.</p>
           </div>
 
           {currentCvFilename ? (
