@@ -94,8 +94,11 @@ export default function ProfileEditor() {
         throw new Error(result.error || 'Failed to update profile');
       }
 
-      setMessage({ type: 'success', text: 'Profile updated successfully! Changes will appear on the homepage.' });
+      setMessage({ type: 'success', text: '✓ Saved! Profile updated successfully. Changes will appear on the homepage.' });
       reset(data); // Reset form with new data to clear isDirty
+      
+      // Auto-dismiss success message after 5 seconds
+      setTimeout(() => setMessage(null), 5000);
     } catch (error) {
       setMessage({
         type: 'error',
@@ -208,18 +211,6 @@ export default function ProfileEditor() {
   return (
     <div className="bg-card border border-border p-6">
       <h2 className="font-serif text-xl font-semibold text-foreground mb-6">Edit Profile</h2>
-
-      {message && (
-        <div
-          className={`mb-4 p-4 border ${
-            message.type === 'success'
-              ? 'bg-card border-foreground/20 text-foreground'
-              : 'bg-card border-destructive/20 text-destructive'
-          }`}
-        >
-          {message.text}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -506,6 +497,18 @@ export default function ProfileEditor() {
             </div>
           )}
         </div>
+
+        {message && (
+          <div
+            className={`p-4 border-l-4 rounded ${
+              message.type === 'success'
+                ? 'bg-green-50 border-green-500 text-green-800'
+                : 'bg-red-50 border-red-500 text-red-800'
+            } font-sans font-semibold shadow-sm`}
+          >
+            {message.text}
+          </div>
+        )}
 
         <div className="flex justify-end space-x-4">
           <button

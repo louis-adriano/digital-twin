@@ -120,72 +120,78 @@ export default function EmbeddingsManagementPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Embeddings Management</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-serif font-bold text-foreground mb-3">AI Embeddings</h1>
+        <p className="text-muted-foreground font-sans mb-2">Manage vector embeddings used by your AI chatbot for semantic search.</p>
+        <p className="text-sm text-muted-foreground font-sans">Embeddings help the AI understand and find relevant information from your portfolio.</p>
+      </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-          <h3 className="text-lg font-medium text-red-800">Error</h3>
-          <p className="text-red-600 mt-2">{error}</p>
+        <div className="bg-red-50 border-l-4 border-red-500 rounded p-4 mb-6">
+          <h3 className="font-sans font-semibold text-red-800 mb-1">Error Loading Embeddings</h3>
+          <p className="text-red-700 font-sans text-sm mb-3">{error}</p>
           <button
             onClick={loadEmbeddingsInfo}
-            className="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            className="px-4 py-2 bg-red-600 text-white rounded font-sans text-sm hover:bg-red-700 transition-colors"
           >
-            Retry
+            Try Again
           </button>
         </div>
       )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Vector Count</h3>
-          <p className="text-3xl font-bold text-blue-600">{info?.vectorCount || 0}</p>
-          <p className="text-sm text-gray-500 mt-1">Total vectors in database</p>
+        <div className="bg-card border border-border rounded-lg p-6">
+          <h3 className="text-sm font-sans font-medium text-muted-foreground mb-2">Vector Count</h3>
+          <p className="text-3xl font-serif font-bold text-blue-600">{info?.vectorCount || 0}</p>
+          <p className="text-xs text-muted-foreground font-sans mt-1">AI knowledge pieces stored</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Dimensions</h3>
-          <p className="text-3xl font-bold text-green-600">{info?.dimension || 0}</p>
-          <p className="text-sm text-gray-500 mt-1">Vector dimensions</p>
+        <div className="bg-card border border-border rounded-lg p-6">
+          <h3 className="text-sm font-sans font-medium text-muted-foreground mb-2">Vector Dimensions</h3>
+          <p className="text-3xl font-serif font-bold text-green-600">{info?.dimension || 0}</p>
+          <p className="text-xs text-muted-foreground font-sans mt-1">Size of each vector (1536 = OpenAI)</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Content Chunks</h3>
-          <p className="text-3xl font-bold text-purple-600">{info?.contentChunks || 0}</p>
-          <p className="text-sm text-gray-500 mt-1">Database content chunks</p>
+        <div className="bg-card border border-border rounded-lg p-6">
+          <h3 className="text-sm font-sans font-medium text-muted-foreground mb-2">Content Chunks</h3>
+          <p className="text-3xl font-serif font-bold text-purple-600">{info?.contentChunks || 0}</p>
+          <p className="text-xs text-muted-foreground font-sans mt-1">Source text segments</p>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Vector Operations</h2>
-        <div className="flex flex-wrap gap-4">
+      <div className="bg-card border border-border rounded-lg p-6 mb-8">
+        <h2 className="text-xl font-serif font-semibold text-foreground mb-2">Actions</h2>
+        <p className="text-sm text-muted-foreground font-sans mb-4">Regenerate embeddings after updating content. Clear to start fresh.</p>
+        <div className="flex flex-wrap gap-3">
           <button
             onClick={() => handleAction('regenerate')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-sans font-medium transition-colors"
           >
-            🔄 Regenerate All Embeddings
+            Regenerate All
           </button>
           
           <button
             onClick={() => handleAction('clear')}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md font-medium transition-colors"
+            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md font-sans font-medium transition-colors"
           >
-            🗑️ Clear All Vectors
+            Clear All Vectors
           </button>
           
           <button
             onClick={loadEmbeddingsInfo}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-md font-medium transition-colors"
+            className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-md font-sans font-medium transition-colors"
           >
-            🔄 Refresh Info
+            Refresh Stats
           </button>
         </div>
       </div>
 
       {/* Vector Search */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Vector Search Testing</h2>
+      <div className="bg-card border border-border rounded-lg p-6">
+        <h2 className="text-xl font-serif font-semibold text-foreground mb-2">Test Search</h2>
+        <p className="text-sm text-muted-foreground font-sans mb-4">Test how the AI finds relevant information. Higher scores = better matches.</p>
         
         <form onSubmit={handleSearch} className="mb-6">
           <div className="flex gap-4">
