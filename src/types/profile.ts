@@ -51,4 +51,12 @@ export interface ProfileData {
     end_date: string | null;
     description: string;
   }>;
+  thoughts: Array<{
+    id: number;
+    title: string;
+    excerpt: string;
+    linkedin_url: string | null;
+    published_date: string;
+    is_featured: boolean;
+  }>;
 }

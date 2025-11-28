@@ -38,6 +38,7 @@ async function getProfileData(): Promise<ProfileData | null> {
       skills: [],
       projects: [],
       education: [],
+      thoughts: [],
     };
   } catch (error) {
     console.error('Error fetching profile:', error);
