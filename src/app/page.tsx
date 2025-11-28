@@ -209,7 +209,7 @@ export default async function Home() {
             </div>
             {/* Bottom left decorative rectangle */}
             <div className="absolute bottom-8 -left-12 bg-primary px-4 py-2">
-              <span className="text-primary-foreground font-serif italic text-xs font-light tracking-wide">Let's Connect!</span>
+              <span className="text-primary-foreground font-serif italic text-xs font-light tracking-wide">Let&apos;s Connect!</span>
             </div>
           </div>
         </div>
@@ -466,11 +466,11 @@ export default async function Home() {
       <section className="py-32 px-16 bg-primary text-center">
         <div className="max-w-[700px] mx-auto">
           <h2 className="font-serif italic text-[2.8rem] font-light text-primary-foreground mb-6">
-            Let's create something together
+            Let&apos;s create something together
           </h2>
           <p className="text-[1.05rem] leading-[1.8] text-primary-foreground opacity-85 mb-10">
-            I'm always open to interesting conversations, collaborations, and new opportunities.
-            Whether you want to discuss a project, ask a question, or just say hello, I'd love to hear from you.
+            I&apos;m always open to interesting conversations, collaborations, and new opportunities.
+            Whether you want to discuss a project, ask a question, or just say hello, I&apos;d love to hear from you.
           </p>
           <ConnectButton />
 

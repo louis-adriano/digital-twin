@@ -99,10 +99,10 @@ export default async function Contact() {
             Contact
           </div>
           <h1 className="font-serif italic text-[3.5rem] leading-[1.2] font-light text-foreground mb-6">
-            Let's connect
+            Let&apos;s connect
           </h1>
           <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 max-w-[650px] mx-auto">
-            I'm always open to new opportunities, collaborations, and interesting conversations.
+            I&apos;m always open to new opportunities, collaborations, and interesting conversations.
           </p>
         </div>
       </section>
@@ -117,7 +117,7 @@ export default async function Contact() {
                 Get in touch
               </h2>
               <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 mb-12">
-                Whether you have a project in mind, want to collaborate, or just want to say hello, I'd love to hear from you.
+                Whether you have a project in mind, want to collaborate, or just want to say hello, I&apos;d love to hear from you.
               </p>
 
               <div className="space-y-8">
@@ -212,7 +212,7 @@ export default async function Contact() {
             Prefer another way to connect?
           </h2>
           <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 mb-12 max-w-[650px] mx-auto">
-            I'm active on several platforms. Feel free to reach out wherever you're most comfortable.
+            I&apos;m active on several platforms. Feel free to reach out wherever you&apos;re most comfortable.
           </p>
 
           <div className="flex flex-wrap gap-6 justify-center">

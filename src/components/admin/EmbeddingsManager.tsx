@@ -108,7 +108,7 @@ export default function EmbeddingsManager() {
         <div className="border-b border-border pb-6">
           <h4 className="font-sans font-medium text-foreground mb-2">What are AI Embeddings?</h4>
           <p className="text-sm text-foreground/70 mb-4 font-sans leading-relaxed">
-            AI embeddings power your chatbot's ability to understand and answer questions about your profile. They convert your content into vector representations that enable semantic search and intelligent responses.
+            AI embeddings power your chatbot&apos;s ability to understand and answer questions about your profile. They convert your content into vector representations that enable semantic search and intelligent responses.
           </p>
         </div>
 
@@ -145,7 +145,7 @@ export default function EmbeddingsManager() {
             ⚠️ Danger Zone
           </h4>
           <p className="text-sm text-red-700 mb-4 font-sans">
-            Clear all embeddings from the vector database. You'll need to regenerate them afterward.
+            Clear all embeddings from the vector database. You&apos;ll need to regenerate them afterward.
           </p>
           <button
             onClick={() =>

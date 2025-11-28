@@ -387,7 +387,7 @@ export default function ChatBot() {
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <span className="text-3xl">👋</span>
             </div>
-            <p className="text-foreground font-serif italic text-lg mb-2">Hello! I'm Louis's Digital Twin</p>
+            <p className="text-foreground font-serif italic text-lg mb-2">Hello! I&apos;m Louis&apos;s Digital Twin</p>
             <p className="text-sm text-muted-foreground font-sans max-w-xs">Ask me about experience, skills, projects, or anything else!</p>
           </div>
         ) : (
@@ -470,7 +470,7 @@ export default function ChatBot() {
 
             <p className="text-sm text-gray-600 mb-4">
               Send a direct inquiry to Louis about job opportunities, collaborations, or consulting. 
-              He'll receive an AI-generated summary with your conversation context.
+              He&apos;ll receive an AI-generated summary with your conversation context.
             </p>
 
             <form onSubmit={handleSendNotification} className="space-y-4">

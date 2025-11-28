@@ -421,15 +421,15 @@ export default function ProfileEditor() {
                 <summary className="cursor-pointer font-semibold mb-2">📋 Quick Setup Guide</summary>
                 <ol className="list-decimal list-inside space-y-1 ml-2 mt-2">
                   <li>Upload your CV to Google Drive</li>
-                  <li>Right-click → Share → "Anyone with the link" → Viewer</li>
+                  <li>Right-click → Share → &quot;Anyone with the link&quot; → Viewer</li>
                   <li>Copy the share link</li>
-                  <li>Convert format: <code className="bg-blue-100 px-1 rounded">https://drive.google.com/file/d/FILE_ID/view</code> → <code className="bg-blue-100 px-1 rounded">https://drive.google.com/uc?export=download&id=FILE_ID</code></li>
+                  <li>Convert format: <code className="bg-blue-100 px-1 rounded">https://drive.google.com/file/d/FILE_ID/view</code> → <code className="bg-blue-100 px-1 rounded">https://drive.google.com/uc?export=download&amp;id=FILE_ID</code></li>
                   <li>Add to <code className="bg-blue-100 px-1 rounded">.env.local</code>: <code className="bg-blue-100 px-1 rounded">GOOGLE_DRIVE_CV_URL=YOUR_LINK</code></li>
-                  <li>Add same variable to Vercel environment variables & redeploy</li>
+                  <li>Add same variable to Vercel environment variables &amp; redeploy</li>
                 </ol>
               </details>
             </div>
-            <p className="text-sm text-muted-foreground font-sans">Development uploads work locally but won't deploy to production.</p>
+            <p className="text-sm text-muted-foreground font-sans">Development uploads work locally but won&apos;t deploy to production.</p>
           </div>
 
           {currentCvFilename ? (

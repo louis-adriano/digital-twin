@@ -484,7 +484,7 @@ export default function FloatingChat() {
                   {sessionId && (
                     <>
                       <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-lg shadow-green-400/50"></div>
-                      <span className="text-sm text-primary-foreground/80 font-sans">Chat with AI about Louis' work</span>
+                      <span className="text-sm text-primary-foreground/80 font-sans">Chat with AI about Louis&apos; work</span>
                     </>
                   )}
                 </div>
@@ -533,8 +533,8 @@ export default function FloatingChat() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
                     </div>
-                    <h4 className="font-serif italic text-2xl text-foreground mb-2 font-light">Hello! I'm Cloud</h4>
-                    <p className="text-muted-foreground font-sans">Louis' AI assistant - Ask me anything about his experience, skills, or projects!</p>
+                    <h4 className="font-serif italic text-2xl text-foreground mb-2 font-light">Hello! I&apos;m Cloud</h4>
+                    <p className="text-muted-foreground font-sans">Louis&apos; AI assistant - Ask me anything about his experience, skills, or projects!</p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">
