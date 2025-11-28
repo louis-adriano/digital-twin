@@ -27,7 +27,7 @@ async function getProfileData(): Promise<ProfileData | null> {
     
     const profile = profileResult.rows[0];
     
-    const [experiencesResult, skillsResult, projectsResult, educationResult] = await Promise.all([
+    const [experiencesResult, skillsResult, projectsResult, educationResult, thoughtsResult] = await Promise.all([
       client.query(
         `SELECT * FROM experiences 
          WHERE professional_id = $1 
@@ -41,7 +41,13 @@ async function getProfileData(): Promise<ProfileData | null> {
          ORDER BY CASE WHEN end_date IS NULL THEN 0 ELSE 1 END, start_date DESC`,
         [profile.id]
       ),
-      client.query('SELECT * FROM education WHERE professional_id = $1 ORDER BY start_date DESC', [profile.id])
+      client.query('SELECT * FROM education WHERE professional_id = $1 ORDER BY start_date DESC', [profile.id]),
+      client.query(
+        `SELECT * FROM thoughts 
+         WHERE professional_id = $1 
+         ORDER BY published_date DESC LIMIT 3`,
+        [profile.id]
+      )
     ]);
 
     return {
@@ -88,6 +94,14 @@ async function getProfileData(): Promise<ProfileData | null> {
         start_date: edu.start_date,
         end_date: edu.end_date,
         description: edu.description,
+      })),
+      thoughts: thoughtsResult.rows.map(thought => ({
+        id: thought.id,
+        title: thought.title,
+        excerpt: thought.excerpt,
+        linkedin_url: thought.linkedin_url,
+        published_date: thought.published_date,
+        is_featured: thought.is_featured,
       })),
     };
   } catch (error) {
@@ -406,66 +420,44 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-[1100px] mx-auto">
-            {/* Placeholder blog posts - will be dynamic later */}
-            <div className="group transition-all hover:-translate-y-1">
-              <div className="mb-4">
-                <div className="text-xs text-muted-foreground font-sans mb-2">Nov 20, 2025 • 5 min read</div>
-                <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
-                  On building meaningful digital experiences
-                </h3>
-                <p className="text-[0.9rem] text-foreground opacity-70 leading-[1.6] mb-4">
-                  Exploring what it means to create technology that truly serves people, not the other way around...
-                </p>
-                <a
-                  href={profileData?.profile.linkedin_url || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary font-medium inline-flex items-center gap-2 transition-all group-hover:gap-4 text-[0.9rem]"
-                >
-                  Read more on LinkedIn →
-                </a>
+            {profileData?.thoughts && profileData.thoughts.length > 0 ? (
+              profileData.thoughts.map((thought) => (
+                <div key={thought.id} className="group transition-all hover:-translate-y-1">
+                  <div className="mb-4">
+                    <div className="text-xs text-muted-foreground font-sans mb-2">
+                      {new Date(thought.published_date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                      {' • '}
+                      {Math.max(1, Math.ceil(thought.excerpt.split(' ').length / 200))} min read
+                    </div>
+                    <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
+                      {thought.title}
+                    </h3>
+                    <p className="text-[0.9rem] text-foreground opacity-70 leading-[1.6] mb-4">
+                      {thought.excerpt.split(' ').slice(0, 30).join(' ')}
+                      {thought.excerpt.split(' ').length > 30 ? '...' : ''}
+                    </p>
+                    {thought.linkedin_url && (
+                      <a
+                        href={thought.linkedin_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary font-medium inline-flex items-center gap-2 transition-all group-hover:gap-4 text-[0.9rem]"
+                      >
+                        Read more on LinkedIn →
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-muted-foreground font-sans">No thoughts shared yet. Check back soon!</p>
               </div>
-            </div>
-
-            <div className="group transition-all hover:-translate-y-1">
-              <div className="mb-4">
-                <div className="text-xs text-muted-foreground font-sans mb-2">Nov 15, 2025 • 4 min read</div>
-                <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
-                  The art of creative problem solving
-                </h3>
-                <p className="text-[0.9rem] text-foreground opacity-70 leading-[1.6] mb-4">
-                  How constraints can actually unlock creativity and lead to better solutions than we initially imagined...
-                </p>
-                <a
-                  href={profileData?.profile.linkedin_url || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary font-medium inline-flex items-center gap-2 transition-all group-hover:gap-4 text-[0.9rem]"
-                >
-                  Read more on LinkedIn →
-                </a>
-              </div>
-            </div>
-
-            <div className="group transition-all hover:-translate-y-1">
-              <div className="mb-4">
-                <div className="text-xs text-muted-foreground font-sans mb-2">Nov 10, 2025 • 6 min read</div>
-                <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
-                  Why continuous learning matters
-                </h3>
-                <p className="text-[0.9rem] text-foreground opacity-70 leading-[1.6] mb-4">
-                  In a rapidly evolving field, staying curious and committed to growth isn't optional—it's essential...
-                </p>
-                <a
-                  href={profileData?.profile.linkedin_url || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary font-medium inline-flex items-center gap-2 transition-all group-hover:gap-4 text-[0.9rem]"
-                >
-                  Read more on LinkedIn →
-                </a>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>

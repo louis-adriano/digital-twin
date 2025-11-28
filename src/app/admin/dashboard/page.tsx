@@ -6,10 +6,11 @@ import ProfileEditor from '../../../components/admin/ProfileEditor';
 import ExperienceManager from '../../../components/admin/ExperienceManager';
 import ProjectsManager from '../../../components/admin/ProjectsManager';
 import SkillsManager from '../../../components/admin/SkillsManager';
+import ThoughtsManager from '../../../components/admin/ThoughtsManager';
 import DatabaseManager from '../../../components/admin/DatabaseManager';
 import EmbeddingsManager from '../../../components/admin/EmbeddingsManager';
 
-type ActiveTab = 'profile' | 'experiences' | 'projects' | 'skills' | 'database' | 'embeddings';
+type ActiveTab = 'profile' | 'experiences' | 'projects' | 'skills' | 'thoughts' | 'database' | 'embeddings';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('profile');
@@ -81,6 +82,16 @@ export default function AdminDashboard() {
               }`}
             >
               Skills
+            </button>
+            <button
+              onClick={() => setActiveTab('thoughts')}
+              className={`py-4 px-2 font-sans text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'thoughts'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-foreground/60 hover:text-foreground'
+              }`}
+            >
+              Recent Thoughts
             </button>
             <button
               onClick={() => setActiveTab('database')}
@@ -161,6 +172,20 @@ export default function AdminDashboard() {
               </p>
             </div>
             <SkillsManager />
+          </div>
+        )}
+
+        {activeTab === 'thoughts' && (
+          <div>
+            <div className="mb-8">
+              <h2 className="font-serif italic text-2xl font-light text-foreground mb-2">
+                Recent Thoughts
+              </h2>
+              <p className="text-foreground/70 text-sm font-sans">
+                Share your LinkedIn posts and insights. The 3 most recent thoughts appear on the homepage in the Recent Thoughts section.
+              </p>
+            </div>
+            <ThoughtsManager />
           </div>
         )}
 

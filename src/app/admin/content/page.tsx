@@ -5,8 +5,9 @@ import ProfileEditor from '@/components/admin/ProfileEditor';
 import ExperienceManager from '@/components/admin/ExperienceManager';
 import SkillsManager from '@/components/admin/SkillsManager';
 import ProjectsManager from '@/components/admin/ProjectsManager';
+import ThoughtsManager from '@/components/admin/ThoughtsManager';
 
-type TabType = 'profile' | 'experiences' | 'skills' | 'projects';
+type TabType = 'profile' | 'experiences' | 'skills' | 'projects' | 'thoughts';
 
 export default function ContentManagementPage() {
   const [activeTab, setActiveTab] = useState<TabType>('profile');
@@ -16,6 +17,7 @@ export default function ContentManagementPage() {
     { id: 'experiences' as TabType, name: 'Experiences', icon: '💼' },
     { id: 'skills' as TabType, name: 'Skills', icon: '🛠️' },
     { id: 'projects' as TabType, name: 'Projects', icon: '🚀' },
+    { id: 'thoughts' as TabType, name: 'Recent Thoughts', icon: '💭' },
   ];
 
   return (
@@ -48,6 +50,7 @@ export default function ContentManagementPage() {
         {activeTab === 'experiences' && <ExperienceManager />}
         {activeTab === 'skills' && <SkillsManager />}
         {activeTab === 'projects' && <ProjectsManager />}
+        {activeTab === 'thoughts' && <ThoughtsManager />}
       </div>
     </div>
   );

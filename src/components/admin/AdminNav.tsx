@@ -6,10 +6,7 @@ import { useState } from 'react';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
-  { name: 'Content', href: '/admin/content', icon: '📝' },
-  { name: 'Embeddings', href: '/admin/embeddings', icon: '🧠' },
   { name: 'Analytics', href: '/admin/analytics', icon: '📈' },
-  { name: 'Database', href: '/admin/database', icon: '🗄️' },
 ];
 
 export default function AdminNav() {
