@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ChatMessage {
   id: number;
@@ -384,16 +385,58 @@ export default function ChatBot() {
       <div className="flex-1 p-4 overflow-y-auto bg-[#ebe6da]">
         {chatMessages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center px-4">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <motion.div 
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4"
+            >
               <span className="text-3xl">👋</span>
-            </div>
-            <p className="text-foreground font-serif italic text-lg mb-2">Hello! I&apos;m Louis&apos;s Digital Twin</p>
-            <p className="text-sm text-muted-foreground font-sans max-w-xs">Ask me about experience, skills, projects, or anything else!</p>
+            </motion.div>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="text-foreground font-serif italic text-lg mb-2"
+            >
+              Hello! I&apos;m Louis&apos;s Digital Twin
+            </motion.p>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+              className="text-sm text-muted-foreground font-sans max-w-xs"
+            >
+              Ask me about experience, skills, projects, or anything else!
+            </motion.p>
           </div>
         ) : (
           <div className="space-y-4">
+            <AnimatePresence initial={false}>
             {chatMessages.map((msg, index) => (
-              <div key={msg.id || index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <motion.div 
+                key={msg.id || index}
+                initial={{ 
+                  opacity: 0, 
+                  x: msg.role === 'user' ? 50 : -50,
+                  scale: 0.8
+                }}
+                animate={{ 
+                  opacity: 1, 
+                  x: 0,
+                  scale: 1
+                }}
+                exit={{ 
+                  opacity: 0, 
+                  scale: 0.8,
+                  transition: { duration: 0.2 }
+                }}
+                transition={{ 
+                  duration: 0.3,
+                  ease: "easeOut"
+                }}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
                 <div className={`flex gap-2 max-w-[75%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                   {/* Avatar */}
                   <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
@@ -424,8 +467,9 @@ export default function ChatBot() {
                     </span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
+            </AnimatePresence>
             <div ref={messagesEndRef} />
           </div>
         )}
@@ -455,9 +499,24 @@ export default function ChatBot() {
       </form>
 
       {/* Notification Modal */}
+      <AnimatePresence>
       {showNotifyModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowNotifyModal(false)}
+        >
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+          >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold text-gray-900">📧 Send Work Inquiry to Louis</h3>
               <button
@@ -553,9 +612,10 @@ export default function ChatBot() {
             <p className="text-xs text-gray-500 mt-4">
               💡 Your conversation history with the AI will be included to give Louis context.
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   );
 }

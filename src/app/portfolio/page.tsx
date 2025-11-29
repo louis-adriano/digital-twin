@@ -5,6 +5,7 @@ import { ProfileData } from '../../types/profile';
 import Link from 'next/link';
 import ContentSections from '../../components/ContentSections';
 import FloatingChat from '../../components/FloatingChat';
+import FadeIn from '../../components/animations/FadeIn';
 
 export default function Portfolio() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
@@ -146,41 +147,53 @@ export default function Portfolio() {
       {/* Page Header */}
       <section className="pt-32 pb-16 px-16 bg-[#f5f1e8] relative overflow-hidden">
         <div className="max-w-[1300px] mx-auto text-center relative z-10">
-          <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-6">
-            Portfolio
-          </div>
-          <h1 className="font-serif italic text-[3.5rem] leading-[1.2] font-light text-foreground mb-6">
-            Work & Experience
-          </h1>
-          <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 max-w-[650px] mx-auto">
-            A comprehensive look at my professional journey, projects, skills, and education.
-          </p>
+          <FadeIn direction="none" delay={0.1}>
+            <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-6">
+              Portfolio
+            </div>
+          </FadeIn>
+          <FadeIn direction="up" delay={0.2}>
+            <h1 className="font-serif italic text-[3.5rem] leading-[1.2] font-light text-foreground mb-6">
+              Work & Experience
+            </h1>
+          </FadeIn>
+          <FadeIn direction="up" delay={0.3}>
+            <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 max-w-[650px] mx-auto">
+              A comprehensive look at my professional journey, projects, skills, and education.
+            </p>
+          </FadeIn>
         </div>
       </section>
 
       {/* Main Content - Alternating Backgrounds */}
       <div>
-        {sections.map((section, index) => (
-          <section
-            key={section.key}
-            ref={(el) => {
-              sectionRefs.current[section.key] = el;
-            }}
-            data-section={section.key}
-            className={`py-16 px-16 ${
-              index % 2 === 0 ? "bg-[#ebe6da]" : "bg-[#f5f1e8]"
-            }`}
-          >
-            <div className="max-w-[1300px] mx-auto">
-              <ContentSections
-                activeSection={section.key}
-                profileData={profileData}
-                formatDate={formatDate}
-                singleSection={true}
-              />
-            </div>
-          </section>
-        ))}
+        {sections.map((section, index) => {
+          // Alternate animation directions: up, left, up, right, up
+          const directions: Array<'up' | 'left' | 'right'> = ['up', 'left', 'up', 'right', 'up'];
+          const direction = directions[index % directions.length];
+          
+          return (
+            <section
+              key={section.key}
+              ref={(el) => {
+                sectionRefs.current[section.key] = el;
+              }}
+              data-section={section.key}
+              className={`py-16 px-16 ${
+                index % 2 === 0 ? "bg-[#ebe6da]" : "bg-[#f5f1e8]"
+              }`}
+            >
+              <FadeIn direction={direction} className="max-w-[1300px] mx-auto">
+                <ContentSections
+                  activeSection={section.key}
+                  profileData={profileData}
+                  formatDate={formatDate}
+                  singleSection={true}
+                />
+              </FadeIn>
+            </section>
+          );
+        })}
       </div>
 
       {/* Footer */}

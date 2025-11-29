@@ -3,6 +3,9 @@ import FloatingChat from '../components/FloatingChat';
 import Link from 'next/link';
 import { ConnectButton } from '../components/ConnectButton';
 import { Client } from 'pg';
+import FadeIn from '../components/animations/FadeIn';
+import StaggerContainer from '../components/animations/StaggerContainer';
+import StaggerItem from '../components/animations/StaggerItem';
 
 // Format date helper
 const formatDate = (dateString: string | null) => {
@@ -170,7 +173,7 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="min-h-screen flex items-center justify-center px-16 pt-24 pb-16 bg-[#f5f1e8]">
         <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 items-center gap-16">
-        <div className="max-w-[600px] mx-auto lg:mx-0 lg:ml-auto">
+        <FadeIn direction="up" delay={0.2} className="max-w-[600px] mx-auto lg:mx-0 lg:ml-auto">
           <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-6">
             Welcome
           </div>
@@ -194,9 +197,9 @@ export default async function Home() {
               Get in touch
             </Link>
           </div>
-        </div>
+        </FadeIn>
 
-        <div className="relative h-[550px] flex items-center justify-center mx-auto lg:mx-0 lg:mr-auto">
+        <FadeIn direction="right" delay={0.4} className="relative h-[550px] flex items-center justify-center mx-auto lg:mx-0 lg:mr-auto">
           <div className="relative w-[350px] h-[440px] bg-primary rounded-none shadow-[0_15px_50px_rgba(42,42,42,0.12)] overflow-visible">
             <img 
               src="/images/hero.jpg" 
@@ -212,14 +215,14 @@ export default async function Home() {
               <span className="text-primary-foreground font-serif italic text-xs font-light tracking-wide">Let&apos;s Connect!</span>
             </div>
           </div>
-        </div>
+        </FadeIn>
         </div>
       </section>
 
       {/* About Section */}
       <section className="py-32 px-16 bg-[#ebe6da]">
         <div className="max-w-[1300px] mx-auto">
-          <div className="max-w-[800px] mx-auto text-center">
+          <FadeIn direction="up" className="max-w-[800px] mx-auto text-center">
             <div className="bg-primary px-16 py-0.5 mb-10 inline-block">
               <h2 className="font-serif italic text-[2.2rem] font-light text-primary-foreground m-0">
                 About Me
@@ -231,25 +234,25 @@ export default async function Home() {
             <p className="text-[1.05rem] leading-[1.9] text-foreground opacity-80">
               {profileData?.profile.summary || "I'm passionate about technology and spend my days building digital solutions. My journey has taken me through various projects and challenges, shaping how I approach problems and create solutions today."}
             </p>
-          </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* Expertise Section */}
       <section className="py-32 px-16 bg-[#f5f1e8]">
         <div className="max-w-[1300px] mx-auto">
-          <div className="text-center mb-20">
+          <FadeIn direction="up" className="text-center mb-20">
             <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-3">
               Expertise
             </div>
             <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
               What I do
             </h2>
-          </div>
+          </FadeIn>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 max-w-[1100px] mx-auto">
+          <StaggerContainer className="grid grid-cols-1 lg:grid-cols-3 gap-16 max-w-[1100px] mx-auto">
             {/* Service Cards */}
-            <div className="transition-all hover:-translate-y-1">
+            <StaggerItem className="transition-all hover:-translate-y-1">
               <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5">
                 <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
@@ -262,9 +265,9 @@ export default async function Home() {
                 Building scalable applications with Next.js, TypeScript, and React. Creating high-performance 
                 platforms with 90+ PageSpeed scores and modern architecture.
               </p>
-            </div>
+            </StaggerItem>
 
-            <div className="transition-all hover:-translate-y-1">
+            <StaggerItem className="transition-all hover:-translate-y-1">
               <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5">
                 <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -277,9 +280,9 @@ export default async function Home() {
                 Developing AI-powered systems with RAG architecture and vector databases. 
                 Achieving 90%+ accuracy with semantic search and real-time NLP.
               </p>
-            </div>
+            </StaggerItem>
 
-            <div className="transition-all hover:-translate-y-1">
+            <StaggerItem className="transition-all hover:-translate-y-1">
               <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5">
                 <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
@@ -292,22 +295,22 @@ export default async function Home() {
                 Deploying production applications on Vercel and AWS with automated workflows. 
                 Sub-second response times with seamless scalability.
               </p>
-            </div>
-          </div>
+            </StaggerItem>
+          </StaggerContainer>
         </div>
       </section>
 
       {/* Featured Projects Section */}
       <section className="py-32 px-16 bg-[#ebe6da]">
         <div className="max-w-[1300px] mx-auto">
-          <div className="text-center mb-20">
+          <FadeIn direction="up" className="text-center mb-20">
             <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-3">
               Portfolio
             </div>
             <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
-              Selected work
+              Selected works
             </h2>
-          </div>
+          </FadeIn>
 
           {/* Current Work Badge */}
           {profileData?.experiences && profileData.experiences.length > 0 && (() => {
@@ -320,6 +323,7 @@ export default async function Home() {
             const currentExp = sortedExperiences[0];
             
             return (
+              <FadeIn direction="up" delay={0.2}>
               <div className="max-w-[900px] mx-auto mb-12 p-6 bg-background border-l-4 border-primary">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
@@ -332,17 +336,18 @@ export default async function Home() {
                   {currentExp.company} • {formatDate(currentExp.start_date)} - {currentExp.end_date ? formatDate(currentExp.end_date) : 'Present'}
                 </p>
               </div>
+              </FadeIn>
             );
           })()}
 
           {/* Recent Projects */}
-          <div className="max-w-[900px] mx-auto space-y-6 mb-12">
+          <StaggerContainer className="max-w-[900px] mx-auto space-y-6 mb-12" staggerDelay={0.15}>
             {profileData?.projects
               .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())
               .slice(0, 2)
               .map((project, index) => (
+              <StaggerItem key={project.id}>
               <div
-                key={project.id}
                 className="group w-full bg-background border border-border hover:border-primary transition-all duration-300 p-6"
               >
                 <div className="flex items-start gap-6">
@@ -381,36 +386,37 @@ export default async function Home() {
                   </div>
                 </div>
               </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
 
-          <div className="text-center">
+          <FadeIn direction="up" delay={0.3} className="text-center">
             <Link
               href="/portfolio"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-3 rounded-[30px] font-medium text-[0.95rem] transition-all hover:bg-[#3d6149] hover:-translate-y-0.5"
             >
               View all projects
             </Link>
-          </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* Writing/Blog Section */}
       <section className="py-32 px-16 bg-[#f5f1e8]">
         <div className="max-w-[1300px] mx-auto">
-          <div className="text-center mb-20">
+          <FadeIn direction="up" className="text-center mb-20">
             <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-3">
-              Writing
+              Posts
             </div>
             <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
               Recent thoughts
             </h2>
-          </div>
+          </FadeIn>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-[1100px] mx-auto">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-[1100px] mx-auto">
             {profileData?.thoughts && profileData.thoughts.length > 0 ? (
               profileData.thoughts.map((thought) => (
-                <div key={thought.id} className="group transition-all hover:-translate-y-1">
+                <StaggerItem key={thought.id} className="group transition-all hover:-translate-y-1">
                   <div className="mb-4">
                     <div className="text-xs text-muted-foreground font-sans mb-2">
                       {new Date(thought.published_date).toLocaleDateString('en-US', {
@@ -439,20 +445,20 @@ export default async function Home() {
                       </a>
                     )}
                   </div>
-                </div>
+                </StaggerItem>
               ))
             ) : (
               <div className="col-span-3 text-center py-12">
                 <p className="text-muted-foreground font-sans">No thoughts shared yet. Check back soon!</p>
               </div>
             )}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
       {/* Connect Section */}
       <section className="py-32 px-16 bg-primary text-center">
-        <div className="max-w-[700px] mx-auto">
+        <FadeIn direction="up" className="max-w-[700px] mx-auto">
           <h2 className="font-serif italic text-[2.8rem] font-light text-primary-foreground mb-6">
             Let&apos;s create something together
           </h2>
@@ -492,7 +498,7 @@ export default async function Home() {
               </a>
             )}
           </div>
-        </div>
+        </FadeIn>
       </section>
 
       {/* Footer */}

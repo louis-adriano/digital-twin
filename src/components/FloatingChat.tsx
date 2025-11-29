@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ChatMessage {
   id: number;
@@ -358,13 +359,7 @@ export default function FloatingChat() {
                 const parsed = JSON.parse(data);
                 if (parsed.content) {
                   accumulatedContent += parsed.content;
-                  setChatMessages(prev => 
-                    prev.map(msg => 
-                      msg.isTyping 
-                        ? { ...msg, content: accumulatedContent + '▋' }
-                        : msg
-                    )
-                  );
+                  // Don't update messages during streaming - wait for [DONE]
                 }
               } catch {
                 // Skip malformed JSON
@@ -459,34 +454,96 @@ export default function FloatingChat() {
   return (
     <>
       {/* Floating Chat Button - Fixed bottom right */}
+      <AnimatePresence>
       {!isChatOpen && (
-        <button
-          data-chat-trigger="true"
-          onClick={() => setIsChatOpen(true)}
-          className="fixed bottom-8 right-8 bg-primary text-primary-foreground w-16 h-16 rounded-full shadow-2xl hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center text-2xl z-50"
-          title="Chat with my AI twin"
+        <motion.div
+          className="fixed bottom-8 right-8 z-50 flex items-center gap-3"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-        </button>
+          {/* Tooltip */}
+          <motion.div
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ 
+              opacity: [0, 0, 0, 1, 1, 0],
+              x: [10, 10, 10, 0, 0, 10]
+            }}
+            transition={{
+              duration: 3.6,
+              times: [0, 0.17, 0.19, 0.25, 0.9, 1],
+              repeat: Infinity,
+              repeatDelay: 26.4
+            }}
+            className="relative bg-background border border-border px-3 py-1.5 rounded-2xl shadow-lg whitespace-nowrap"
+          >
+            <span className="text-xs font-sans text-foreground">Got a question?</span>
+            {/* Chat bubble tail */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[7px] w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[8px] border-l-border" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[6px] w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-l-[7px] border-l-background" />
+          </motion.div>
+
+          {/* Button */}
+          <motion.button
+            animate={{ 
+              y: [0, -10, 0],
+            }}
+            transition={{
+              duration: 0.6,
+              repeat: Infinity,
+              repeatDelay: 29.4,
+              ease: "easeInOut"
+            }}
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileTap={{ scale: 0.9 }}
+            data-chat-trigger="true"
+            onClick={() => setIsChatOpen(true)}
+            className="bg-primary text-primary-foreground w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-2xl"
+            title="Chat with my AI twin"
+          >
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </motion.button>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {/* Large Centered Chat Window */}
+      <AnimatePresence>
       {isChatOpen && (
-        <div className="fixed inset-0 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm z-[100]">
-          <div className="w-full max-w-4xl h-[80vh] bg-background border border-border shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-300">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm z-[100]"
+          onClick={() => setIsChatOpen(false)}
+        >
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0, y: 50 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 50 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-4xl h-[80vh] bg-background border border-border shadow-2xl flex flex-col"
+          >
             {/* Chat Header */}
             <div className="flex justify-between items-center px-6 py-5 bg-gradient-to-r from-primary to-[#3d6149] flex-shrink-0">
               <div>
                 <h3 className="font-serif italic text-xl font-light text-primary-foreground">Ask Cloud</h3>
                 <div className="flex items-center gap-2 mt-1">
-                  {sessionId && (
-                    <>
-                      <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-lg shadow-green-400/50"></div>
-                      <span className="text-sm text-primary-foreground/80 font-sans">Chat with AI about Louis&apos; work</span>
-                    </>
-                  )}
+                  <motion.div 
+                    initial={{ backgroundColor: '#ef4444' }}
+                    animate={{ backgroundColor: sessionId ? '#4ade80' : '#ef4444' }}
+                    transition={{ duration: 0.5 }}
+                    className="w-2 h-2 rounded-full shadow-lg"
+                    style={{ 
+                      boxShadow: sessionId ? '0 0 10px rgba(74, 222, 128, 0.5)' : '0 0 10px rgba(239, 68, 68, 0.5)'
+                    }}
+                  />
+                  <span className="text-sm text-primary-foreground/80 font-sans">Chat with AI about Louis&apos; work</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -528,13 +585,32 @@ export default function FloatingChat() {
               {chatMessages.length === 0 ? (
                 <div className="text-center py-16">
                   <div className="mb-8">
-                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <motion.div 
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4"
+                    >
                       <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
-                    </div>
-                    <h4 className="font-serif italic text-2xl text-foreground mb-2 font-light">Hello! I&apos;m Cloud</h4>
-                    <p className="text-muted-foreground font-sans">Louis&apos; AI assistant - Ask me anything about his experience, skills, or projects!</p>
+                    </motion.div>
+                    <motion.h4 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2, duration: 0.4 }}
+                      className="font-serif italic text-2xl text-foreground mb-2 font-light"
+                    >
+                      Hello! I&apos;m Cloud
+                    </motion.h4>
+                    <motion.p 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3, duration: 0.4 }}
+                      className="text-muted-foreground font-sans"
+                    >
+                      Louis&apos; AI assistant - Ask me anything about his experience, skills, or projects!
+                    </motion.p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">
@@ -559,8 +635,27 @@ export default function FloatingChat() {
                 </div>
               ) : (
                 <div className="space-y-4">
+                  <AnimatePresence initial={false} mode="popLayout">
                   {chatMessages.map((msg, index) => (
-                    <div key={msg.id || index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <motion.div 
+                      key={msg.id || index}
+                      initial={{ 
+                        opacity: 0, 
+                        y: 20,
+                        scale: 0.95
+                      }}
+                      animate={{ 
+                        opacity: 1, 
+                        y: 0,
+                        scale: 1
+                      }}
+                      transition={{ 
+                        duration: 0.4,
+                        ease: [0.25, 0.46, 0.45, 0.94]
+                      }}
+                      layout
+                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
                       <div className={`max-w-[80%]`}>
                         {/* Message bubble */}
                         <div className="flex flex-col gap-1.5">
@@ -584,8 +679,9 @@ export default function FloatingChat() {
                           </span>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
+                  </AnimatePresence>
                   <div ref={messagesEndRef} className="h-1" />
                 </div>
               )}
@@ -617,14 +713,30 @@ export default function FloatingChat() {
                 <p className="text-xs text-muted-foreground mt-2 font-sans">Press Enter to send, Shift+Enter for new line</p>
               </form>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {/* Notification Modal */}
+      <AnimatePresence>
       {showNotifyModal && (
-        <div className="fixed inset-0 bg-background/90 backdrop-blur-md flex items-center justify-center z-[110] p-4 animate-in fade-in duration-200">
-          <div className="bg-background max-w-lg w-full border border-border shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 bg-background/90 backdrop-blur-md flex items-center justify-center z-[110] p-4"
+          onClick={() => setShowNotifyModal(false)}
+        >
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-background max-w-lg w-full border border-border shadow-2xl overflow-hidden"
+          >
             <div className="bg-primary p-8 text-primary-foreground">
               <div className="flex justify-between items-start">
                 <div>
@@ -746,9 +858,10 @@ export default function FloatingChat() {
                 </p>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </>
   );
 }

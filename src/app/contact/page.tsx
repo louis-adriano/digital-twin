@@ -3,6 +3,9 @@ import Link from 'next/link';
 import FloatingChat from '../../components/FloatingChat';
 import { ChatTriggerButton } from '../../components/ChatTriggerButton';
 import { Client } from 'pg';
+import FadeIn from '../../components/animations/FadeIn';
+import StaggerContainer from '../../components/animations/StaggerContainer';
+import StaggerItem from '../../components/animations/StaggerItem';
 
 // Fetch profile data directly from database
 async function getProfileData(): Promise<ProfileData | null> {
@@ -95,15 +98,21 @@ export default async function Contact() {
       {/* Page Header */}
       <section className="pt-32 pb-16 px-16 bg-[#f5f1e8]">
         <div className="max-w-[1300px] mx-auto text-center">
-          <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-6">
-            Contact
-          </div>
-          <h1 className="font-serif italic text-[3.5rem] leading-[1.2] font-light text-foreground mb-6">
-            Let&apos;s connect
-          </h1>
-          <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 max-w-[650px] mx-auto">
-            I&apos;m always open to new opportunities, collaborations, and interesting conversations.
-          </p>
+          <FadeIn direction="none" delay={0.1}>
+            <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-6">
+              Contact
+            </div>
+          </FadeIn>
+          <FadeIn direction="up" delay={0.2}>
+            <h1 className="font-serif italic text-[3.5rem] leading-[1.2] font-light text-foreground mb-6">
+              Let&apos;s connect
+            </h1>
+          </FadeIn>
+          <FadeIn direction="up" delay={0.3}>
+            <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 max-w-[650px] mx-auto">
+              I&apos;m always open to new opportunities, collaborations, and interesting conversations.
+            </p>
+          </FadeIn>
         </div>
       </section>
 
@@ -112,6 +121,7 @@ export default async function Contact() {
         <div className="max-w-[1100px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-24">
             {/* Left Column - Contact Info */}
+            <FadeIn direction="left">
             <div>
               <h2 className="font-serif italic text-[2rem] font-light text-foreground mb-8">
                 Get in touch
@@ -187,8 +197,10 @@ export default async function Contact() {
                 )}
               </div>
             </div>
+            </FadeIn>
 
             {/* Right Column - AI Chat CTA */}
+            <FadeIn direction="right">
             <div className="bg-primary p-12 rounded-[4px] flex flex-col justify-center">
               <svg className="w-12 h-12 text-primary-foreground mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -201,6 +213,7 @@ export default async function Contact() {
               </p>
               <ChatTriggerButton />
             </div>
+            </FadeIn>
           </div>
         </div>
       </section>
@@ -208,15 +221,20 @@ export default async function Contact() {
       {/* Alternative Contact Methods */}
       <section className="py-32 px-16 bg-[#f5f1e8]">
         <div className="max-w-[1100px] mx-auto text-center">
-          <h2 className="font-serif italic text-[2.5rem] font-light text-foreground mb-6">
-            Prefer another way to connect?
-          </h2>
-          <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 mb-12 max-w-[650px] mx-auto">
-            I&apos;m active on several platforms. Feel free to reach out wherever you&apos;re most comfortable.
-          </p>
+          <FadeIn direction="up">
+            <h2 className="font-serif italic text-[2.5rem] font-light text-foreground mb-6">
+              Prefer another way to connect?
+            </h2>
+          </FadeIn>
+          <FadeIn direction="up" delay={0.1}>
+            <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 mb-12 max-w-[650px] mx-auto">
+              I&apos;m active on several platforms. Feel free to reach out wherever you&apos;re most comfortable.
+            </p>
+          </FadeIn>
 
-          <div className="flex flex-wrap gap-6 justify-center">
+          <StaggerContainer className="flex flex-wrap gap-6 justify-center" staggerDelay={0.1}>
             {profileData?.profile.linkedin_url && (
+              <StaggerItem>
               <a
                 href={profileData.profile.linkedin_url}
                 target="_blank"
@@ -225,8 +243,10 @@ export default async function Contact() {
               >
                 LinkedIn
               </a>
+              </StaggerItem>
             )}
             {profileData?.profile.github_url && (
+              <StaggerItem>
               <a
                 href={profileData.profile.github_url}
                 target="_blank"
@@ -235,16 +255,19 @@ export default async function Contact() {
               >
                 GitHub
               </a>
+              </StaggerItem>
             )}
             {profileData?.profile.email && (
+              <StaggerItem>
               <a
                 href={`mailto:${profileData.profile.email}`}
                 className="border-2 border-foreground text-foreground px-8 py-3 rounded-[30px] font-medium text-[0.95rem] transition-all hover:bg-foreground hover:text-background hover:-translate-y-0.5"
               >
                 Send Email
               </a>
+              </StaggerItem>
             )}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
