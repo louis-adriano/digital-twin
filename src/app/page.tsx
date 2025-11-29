@@ -202,7 +202,7 @@ export default async function Home() {
                 />
                 {/* Top right decorative rectangle */}
                 <div className="absolute top-4 -right-8 bg-primary px-3 py-1">
-                  <span className="text-primary-foreground font-serif italic text-xs font-light tracking-wide">Based in Sydney</span>
+                  <span className="text-primary-foreground font-serif italic text-[0.65rem] font-light tracking-wide">Based in Sydney!</span>
                 </div>
                 {/* Bottom left decorative rectangle */}
                 <div className="absolute bottom-4 -left-6 bg-primary px-3 py-1">
@@ -240,7 +240,7 @@ export default async function Home() {
             />
             {/* Top right decorative rectangle */}
             <div className="absolute top-4 -right-8 sm:top-8 sm:-right-20 bg-primary px-3 py-1 sm:px-6 sm:py-2">
-              <span className="text-primary-foreground font-serif italic text-xs sm:text-sm font-light tracking-wide">Based in Sydney</span>
+              <span className="text-primary-foreground font-serif italic text-[0.65rem] sm:text-xs font-light tracking-wide">Based in Sydney!</span>
             </div>
             {/* Bottom left decorative rectangle */}
             <div className="absolute bottom-4 -left-6 sm:bottom-8 sm:-left-12 bg-primary px-3 py-1 sm:px-4 sm:py-2">
