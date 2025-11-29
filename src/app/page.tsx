@@ -219,30 +219,18 @@ export default async function Home() {
       {/* About Section */}
       <section className="py-32 px-16 bg-[#ebe6da]">
         <div className="max-w-[1300px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-            <div className="relative h-[450px]">
-              <div className="w-full h-full bg-primary rounded-none shadow-[0_15px_50px_rgba(42,42,42,0.12)] overflow-hidden">
-                <img 
-                  src="/images/about.jpg" 
-                  alt={`About ${profileData?.profile.name || "Louis Adriano"}`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+          <div className="max-w-[800px] mx-auto text-center">
+            <div className="bg-primary px-16 py-0.5 mb-10 inline-block">
+              <h2 className="font-serif italic text-[2.2rem] font-light text-primary-foreground m-0">
+                About Me
+              </h2>
             </div>
-
-            <div className="max-w-[650px]">
-              <div className="bg-primary px-16 py-0.5 mb-10 inline-block">
-                <h2 className="font-serif italic text-[2.2rem] font-light text-primary-foreground m-0">
-                  About Me
-                </h2>
-              </div>
-              <p className="text-[1.05rem] leading-[1.9] text-foreground opacity-80 mb-6">
-                {profileData?.profile.about_greeting || "I warmly welcome you to my corner of the internet."}
-              </p>
-              <p className="text-[1.05rem] leading-[1.9] text-foreground opacity-80">
-                {profileData?.profile.summary || "I'm passionate about technology and spend my days building digital solutions. My journey has taken me through various projects and challenges, shaping how I approach problems and create solutions today."}
-              </p>
-            </div>
+            <p className="text-[1.05rem] leading-[1.9] text-foreground opacity-80 mb-6">
+              {profileData?.profile.about_greeting || "I warmly welcome you to my corner of the internet."}
+            </p>
+            <p className="text-[1.05rem] leading-[1.9] text-foreground opacity-80">
+              {profileData?.profile.summary || "I'm passionate about technology and spend my days building digital solutions. My journey has taken me through various projects and challenges, shaping how I approach problems and create solutions today."}
+            </p>
           </div>
         </div>
       </section>
