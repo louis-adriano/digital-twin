@@ -181,17 +181,38 @@ export default async function Home() {
         {/* Hero Section */}
         <section className="min-h-screen flex items-center justify-center px-6 sm:px-8 lg:px-16 pt-24 sm:pt-28 pb-12 sm:pb-16 bg-[#f5f1e8]" aria-label="Hero">
           <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 items-center gap-12 sm:gap-12 lg:gap-16">
-          <FadeIn direction="up" delay={0.2} className="max-w-[600px] mx-auto lg:mx-0 lg:ml-auto">
-            <div className="text-xs sm:text-xs uppercase tracking-[2px] sm:tracking-[3px] text-primary font-medium mb-5 sm:mb-6">
+          <FadeIn direction="up" delay={0.2} className="max-w-[600px] mx-auto lg:mx-0 lg:ml-auto flex flex-col">
+            <div className="text-xs sm:text-xs uppercase tracking-[2px] sm:tracking-[3px] text-primary font-medium mb-5 sm:mb-6 text-center lg:text-left">
               Welcome
             </div>
-            <h1 className="font-serif italic text-[2.2rem] sm:text-[2.5rem] lg:text-[3.2rem] leading-[1.25] font-light text-foreground mb-5 sm:mb-6">
+            <h1 className="font-serif italic text-[2.2rem] sm:text-[2.5rem] lg:text-[3.2rem] leading-[1.25] font-light text-foreground mb-5 sm:mb-6 text-center lg:text-left">
               {profileData?.profile.bio || "Building at the intersection of creativity and technology."}
             </h1>
-            <p className="text-[0.95rem] sm:text-base lg:text-[1.05rem] leading-[1.75] sm:leading-[1.8] text-foreground opacity-75 mb-8 sm:mb-10">
+            <p className="text-[0.95rem] sm:text-base lg:text-[1.05rem] leading-[1.75] sm:leading-[1.8] text-foreground opacity-75 mb-8 sm:mb-10 text-center lg:text-left">
               {profileData?.profile.hero_subtitle || `I'm ${profileData?.profile.name || "Louis Adriano"}, a ${profileData?.profile.title || "Full-stack Developer"} passionate about creating meaningful digital experiences.`}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+            
+            {/* Picture - Mobile only, centered */}
+            <div className="lg:hidden mb-8 flex justify-center order-1">
+              <div className="relative w-[280px] h-[360px] bg-primary rounded-none shadow-[0_15px_50px_rgba(42,42,42,0.12)] overflow-visible">
+                <img 
+                  src="/images/hero.jpg" 
+                  alt={profileData?.profile.name || "Louis Adriano"}
+                  className="w-full h-full object-cover"
+                />
+                {/* Top right decorative rectangle */}
+                <div className="absolute top-4 -right-8 bg-primary px-3 py-1">
+                  <span className="text-primary-foreground font-serif italic text-xs font-light tracking-wide">Based in Sydney</span>
+                </div>
+                {/* Bottom left decorative rectangle */}
+                <div className="absolute bottom-4 -left-6 bg-primary px-3 py-1">
+                  <span className="text-primary-foreground font-serif italic text-[0.65rem] font-light tracking-wide">Let&apos;s Connect!</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 order-2">
               <Link
                 href="/portfolio"
                 className="bg-primary text-primary-foreground px-8 sm:px-8 py-3.5 sm:py-[0.9rem] rounded-[30px] font-medium text-[0.95rem] sm:text-[0.95rem] transition-all hover:bg-[#3d6149] hover:-translate-y-0.5 text-center focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none"
@@ -209,7 +230,8 @@ export default async function Home() {
             </div>
           </FadeIn>
 
-        <FadeIn direction="right" delay={0.4} className="relative h-[400px] sm:h-[500px] lg:h-[550px] flex items-center justify-center mx-auto lg:mx-0 lg:mr-auto">
+        {/* Picture - Desktop only */}
+        <FadeIn direction="right" delay={0.4} className="hidden lg:flex relative h-[400px] sm:h-[500px] lg:h-[550px] items-center justify-center mx-auto lg:mx-0 lg:mr-auto">
           <div className="relative w-[280px] h-[360px] sm:w-[320px] sm:h-[400px] lg:w-[350px] lg:h-[440px] bg-primary rounded-none shadow-[0_15px_50px_rgba(42,42,42,0.12)] overflow-visible">
             <img 
               src="/images/hero.jpg" 
@@ -262,8 +284,8 @@ export default async function Home() {
 
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 sm:gap-12 lg:gap-16 max-w-[1100px] mx-auto">
             {/* Service Cards */}
-            <StaggerItem className="transition-all hover:-translate-y-1">
-              <div className="w-[48px] h-[48px] sm:w-[50px] sm:h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5 sm:mb-5">
+            <StaggerItem className="transition-all hover:-translate-y-1 text-center md:text-left">
+              <div className="w-[48px] h-[48px] sm:w-[50px] sm:h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5 sm:mb-5 mx-auto md:mx-0">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                 </svg>
@@ -276,8 +298,8 @@ export default async function Home() {
               </p>
             </StaggerItem>
 
-            <StaggerItem className="transition-all hover:-translate-y-1">
-              <div className="w-[48px] h-[48px] sm:w-[50px] sm:h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5 sm:mb-5">
+            <StaggerItem className="transition-all hover:-translate-y-1 text-center md:text-left">
+              <div className="w-[48px] h-[48px] sm:w-[50px] sm:h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5 sm:mb-5 mx-auto md:mx-0">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
@@ -290,8 +312,8 @@ export default async function Home() {
               </p>
             </StaggerItem>
 
-            <StaggerItem className="transition-all hover:-translate-y-1">
-              <div className="w-[48px] h-[48px] sm:w-[50px] sm:h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5 sm:mb-5">
+            <StaggerItem className="transition-all hover:-translate-y-1 text-center md:text-left">
+              <div className="w-[48px] h-[48px] sm:w-[50px] sm:h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5 sm:mb-5 mx-auto md:mx-0">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
                 </svg>

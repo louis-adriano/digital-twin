@@ -563,23 +563,23 @@ export default function FloatingChat() {
             role="dialog"
             aria-labelledby="chat-title"
             aria-modal="true"
-            className="w-full max-w-4xl h-full sm:h-[80vh] bg-background border-0 sm:border border-border shadow-2xl flex flex-col"
+            className="w-full max-w-4xl h-full sm:h-[80vh] bg-background border-0 sm:border border-border shadow-2xl flex flex-col fixed sm:relative inset-0 sm:inset-auto"
           >
             {/* Chat Header */}
-            <div className="flex justify-between items-center px-4 py-4 sm:px-6 sm:py-5 bg-gradient-to-r from-primary to-[#3d6149] flex-shrink-0">
+            <div className="flex justify-between items-center px-3 py-3 sm:px-6 sm:py-5 bg-gradient-to-r from-primary to-[#3d6149] flex-shrink-0">
               <div>
-                <h3 id="chat-title" className="font-serif italic text-lg sm:text-xl font-light text-primary-foreground">Ask Cloud</h3>
-                <div className="flex items-center gap-2 mt-1">
+                <h3 id="chat-title" className="font-serif italic text-base sm:text-xl font-light text-primary-foreground">Ask Cloud</h3>
+                <div className="flex items-center gap-1.5 mt-0.5">
                   <motion.div 
                     initial={{ backgroundColor: '#ef4444' }}
                     animate={{ backgroundColor: sessionId ? '#4ade80' : '#ef4444' }}
                     transition={{ duration: 0.5 }}
-                    className="w-2 h-2 rounded-full shadow-lg"
+                    className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full shadow-lg"
                     style={{ 
                       boxShadow: sessionId ? '0 0 10px rgba(74, 222, 128, 0.5)' : '0 0 10px rgba(239, 68, 68, 0.5)'
                     }}
                   />
-                  <span className="text-xs sm:text-sm text-primary-foreground/80 font-sans">Chat with AI about Louis&apos; work</span>
+                  <span className="text-[0.65rem] sm:text-sm text-primary-foreground/80 font-sans">Chat with AI about Louis&apos; work</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -593,21 +593,21 @@ export default function FloatingChat() {
                         setSessionId(null);
                       }
                     }}
-                    className="p-2 hover:bg-primary-foreground/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
+                    className="p-1.5 sm:p-2 hover:bg-primary-foreground/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
                     aria-label="Clear conversation history"
                     title="Clear conversation"
                   >
-                    <svg className="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
                 )}
                 <button
                   onClick={() => setIsChatOpen(false)}
-                  className="p-2 hover:bg-primary-foreground/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
+                  className="p-1.5 sm:p-2 hover:bg-primary-foreground/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
                   aria-label="Close chat"
                 >
-                  <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -617,22 +617,22 @@ export default function FloatingChat() {
             {/* Chat Messages */}
             <div 
               ref={chatContainerRef}
-              className="flex-1 p-4 sm:p-6 overflow-y-auto bg-[#ebe6da] min-h-0"
+              className="flex-1 p-3 sm:p-6 overflow-y-auto bg-[#ebe6da] min-h-0"
               style={{ scrollBehavior: 'smooth' }}
               role="log"
               aria-live="polite"
               aria-atomic="false"
             >
               {chatMessages.length === 0 ? (
-                <div className="text-center py-8 sm:py-16">
-                  <div className="mb-6 sm:mb-8">
+                <div className="text-center py-6 sm:py-16">
+                  <div className="mb-4 sm:mb-8">
                     <motion.div 
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4"
+                      className="w-14 h-14 sm:w-20 sm:h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
                     >
-                      <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-7 h-7 sm:w-10 sm:h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
                     </motion.div>
@@ -640,7 +640,7 @@ export default function FloatingChat() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2, duration: 0.4 }}
-                      className="font-serif italic text-xl sm:text-2xl text-foreground mb-2 font-light"
+                      className="font-serif italic text-lg sm:text-2xl text-foreground mb-1.5 sm:mb-2 font-light"
                     >
                       Hello! I&apos;m Cloud
                     </motion.h4>
@@ -648,7 +648,7 @@ export default function FloatingChat() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3, duration: 0.4 }}
-                      className="text-muted-foreground font-sans"
+                      className="text-xs sm:text-base text-muted-foreground font-sans"
                     >
                       Louis&apos; AI assistant - Ask me anything about his experience, skills, or projects!
                     </motion.p>
@@ -676,7 +676,7 @@ export default function FloatingChat() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <AnimatePresence initial={false} mode="popLayout">
                   {chatMessages.map((msg, index) => (
                     <motion.div 
@@ -698,10 +698,10 @@ export default function FloatingChat() {
                       layout
                       className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      <div className={`max-w-[80%]`}>
+                      <div className={`max-w-[85%] sm:max-w-[80%]`}>
                         {/* Message bubble */}
-                        <div className="flex flex-col gap-1.5">
-                          <div className={`px-4 py-3 rounded-2xl font-sans text-[0.92rem] sm:text-[0.95rem] leading-relaxed shadow-md ${
+                        <div className="flex flex-col gap-1">
+                          <div className={`px-3 py-2 sm:px-4 sm:py-3 rounded-2xl font-sans text-[0.85rem] sm:text-[0.95rem] leading-relaxed shadow-md ${
                             msg.role === 'user'
                               ? 'bg-primary text-primary-foreground rounded-br-sm'
                               : 'bg-background text-foreground rounded-bl-sm'
@@ -716,7 +716,7 @@ export default function FloatingChat() {
                               <div className="whitespace-pre-wrap">{msg.content}</div>
                             )}
                           </div>
-                          <span className={`text-xs text-muted-foreground px-2 font-sans ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                          <span className={`text-[0.65rem] sm:text-xs text-muted-foreground px-1 sm:px-2 font-sans ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                             {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                           </span>
                         </div>
@@ -730,9 +730,9 @@ export default function FloatingChat() {
             </div>
 
             {/* Chat Input */}
-            <div className="p-3 sm:p-5 border-t border-border bg-background flex-shrink-0">
+            <div className="p-2 sm:p-5 border-t border-border bg-background flex-shrink-0">
               <form onSubmit={handleSubmit}>
-                <div className="flex gap-2 sm:gap-3 items-end">
+                <div className="flex gap-1.5 sm:gap-3 items-end">
                   <label htmlFor="chat-input" className="sr-only">Type your message</label>
                   <textarea
                     id="chat-input"
@@ -740,7 +740,7 @@ export default function FloatingChat() {
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type your message..."
-                    className="flex-1 px-3 py-2 sm:px-4 sm:py-3 border border-border rounded-2xl bg-[#ebe6da] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans resize-none text-sm sm:text-base"
+                    className="flex-1 px-2.5 py-1.5 sm:px-4 sm:py-3 border border-border rounded-2xl bg-[#ebe6da] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans resize-none text-[0.85rem] sm:text-base"
                     rows={1}
                     disabled={isLoading}
                     aria-label="Chat message input"
@@ -749,7 +749,7 @@ export default function FloatingChat() {
                   <button
                     type="submit"
                     disabled={isLoading || !inputMessage.trim()}
-                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-primary text-primary-foreground rounded-full hover:bg-[#3d6149] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100 disabled:hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    className="flex-shrink-0 w-9 h-9 sm:w-12 sm:h-12 bg-primary text-primary-foreground rounded-full hover:bg-[#3d6149] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100 disabled:hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                     aria-label="Send message"
                   >
                     <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -757,7 +757,7 @@ export default function FloatingChat() {
                     </svg>
                   </button>
                 </div>
-                <p id="chat-input-hint" className="text-xs text-muted-foreground mt-2 font-sans">Press Enter to send, Shift+Enter for new line</p>
+                <p id="chat-input-hint" className="text-[0.65rem] sm:text-xs text-muted-foreground mt-1 sm:mt-2 font-sans">Press Enter to send, Shift+Enter for new line</p>
               </form>
             </div>
           </motion.div>
