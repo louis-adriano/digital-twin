@@ -149,29 +149,6 @@ export default function Portfolio() {
       {/* Floating Chat */}
       <FloatingChat />
 
-      {/* Hero/Header Section */}
-      <section className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 px-4 sm:px-8 lg:px-16 bg-[#f5f1e8]">
-        <div className="max-w-[1400px] mx-auto">
-          <FadeIn direction="up" delay={0.1}>
-            <div className="text-xs sm:text-xs uppercase tracking-[2px] sm:tracking-[3px] text-primary font-medium mb-4 sm:mb-5">
-              Portfolio
-            </div>
-            <h1 className="font-serif italic text-2xl sm:text-[2.5rem] lg:text-[3.5rem] font-light text-foreground mb-3 sm:mb-4">
-              My Journey
-            </h1>
-            <p className="text-foreground opacity-70 text-sm sm:text-base max-w-2xl leading-[1.6] sm:leading-[1.7]">
-              {profileData?.profile.portfolio_summary || "A collection of my experiences, projects, and the skills I've developed along the way."}
-            </p>
-          </FadeIn>
-            <span className="hidden sm:inline">Download CV</span>
-            <span className="sm:hidden">CV</span>
-          </a>
-        </div>
-      </nav>
-
-      {/* Floating Chat Button */}
-      <FloatingChat />
-
       {/* Page Header */}
       <section className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 px-4 sm:px-8 lg:px-16 bg-[#f5f1e8] relative overflow-hidden">
         <div className="max-w-[1300px] mx-auto text-center relative z-10">

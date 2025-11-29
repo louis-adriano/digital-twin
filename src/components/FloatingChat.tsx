@@ -28,6 +28,38 @@ export default function FloatingChat() {
   const [isSendingNotification, setIsSendingNotification] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const chatTriggerRef = useRef<HTMLButtonElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Handle Escape key to close modals
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showNotifyModal) {
+          setShowNotifyModal(false);
+        } else if (isChatOpen) {
+          setIsChatOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isChatOpen, showNotifyModal]);
+
+  // Focus management when chat opens/closes
+  useEffect(() => {
+    if (isChatOpen) {
+      // Save reference to element that opened the modal
+      const activeElement = document.activeElement as HTMLElement;
+      if (activeElement && activeElement !== document.body) {
+        chatTriggerRef.current = activeElement as HTMLButtonElement;
+      }
+    } else if (chatTriggerRef.current) {
+      // Return focus when closing
+      chatTriggerRef.current.focus();
+    }
+  }, [isChatOpen]);
 
   // Auto-scroll to bottom when messages change
   const scrollToBottom = () => {
@@ -499,7 +531,8 @@ export default function FloatingChat() {
             whileTap={{ scale: 0.9 }}
             data-chat-trigger="true"
             onClick={() => setIsChatOpen(true)}
-            className="bg-primary text-primary-foreground w-12 h-12 sm:w-16 sm:h-16 rounded-full shadow-2xl flex items-center justify-center text-2xl"
+            className="bg-primary text-primary-foreground w-12 h-12 sm:w-16 sm:h-16 rounded-full shadow-2xl flex items-center justify-center text-2xl focus:outline-none focus:ring-4 focus:ring-primary/50 focus:ring-offset-2"
+            aria-label="Open chat with AI assistant"
             title="Chat with my AI twin"
           >
             <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -527,12 +560,15 @@ export default function FloatingChat() {
             exit={{ scale: 0.9, opacity: 0, y: 50 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-labelledby="chat-title"
+            aria-modal="true"
             className="w-full max-w-4xl h-full sm:h-[80vh] bg-background border-0 sm:border border-border shadow-2xl flex flex-col"
           >
             {/* Chat Header */}
             <div className="flex justify-between items-center px-4 py-4 sm:px-6 sm:py-5 bg-gradient-to-r from-primary to-[#3d6149] flex-shrink-0">
               <div>
-                <h3 className="font-serif italic text-lg sm:text-xl font-light text-primary-foreground">Ask Cloud</h3>
+                <h3 id="chat-title" className="font-serif italic text-lg sm:text-xl font-light text-primary-foreground">Ask Cloud</h3>
                 <div className="flex items-center gap-2 mt-1">
                   <motion.div 
                     initial={{ backgroundColor: '#ef4444' }}
@@ -557,7 +593,8 @@ export default function FloatingChat() {
                         setSessionId(null);
                       }
                     }}
-                    className="p-2 hover:bg-primary-foreground/10 rounded-lg transition-colors"
+                    className="p-2 hover:bg-primary-foreground/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
+                    aria-label="Clear conversation history"
                     title="Clear conversation"
                   >
                     <svg className="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -567,7 +604,8 @@ export default function FloatingChat() {
                 )}
                 <button
                   onClick={() => setIsChatOpen(false)}
-                  className="p-2 hover:bg-primary-foreground/10 rounded-lg transition-colors"
+                  className="p-2 hover:bg-primary-foreground/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
+                  aria-label="Close chat"
                 >
                   <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -581,6 +619,9 @@ export default function FloatingChat() {
               ref={chatContainerRef}
               className="flex-1 p-4 sm:p-6 overflow-y-auto bg-[#ebe6da] min-h-0"
               style={{ scrollBehavior: 'smooth' }}
+              role="log"
+              aria-live="polite"
+              aria-atomic="false"
             >
               {chatMessages.length === 0 ? (
                 <div className="text-center py-8 sm:py-16">
@@ -626,7 +667,8 @@ export default function FloatingChat() {
                           setInputMessage(suggestion);
                           sendMessage(suggestion);
                         }}
-                        className="p-2 sm:p-3 text-left text-xs sm:text-sm border border-border hover:border-primary hover:bg-background transition-all font-sans rounded-lg"
+                        className="p-2 sm:p-3 text-left text-xs sm:text-sm border border-border hover:border-primary hover:bg-background transition-all font-sans rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        aria-label={`Send message: ${suggestion}`}
                       >
                         {suggestion}
                       </button>
@@ -691,7 +733,9 @@ export default function FloatingChat() {
             <div className="p-3 sm:p-5 border-t border-border bg-background flex-shrink-0">
               <form onSubmit={handleSubmit}>
                 <div className="flex gap-2 sm:gap-3 items-end">
+                  <label htmlFor="chat-input" className="sr-only">Type your message</label>
                   <textarea
+                    id="chat-input"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -699,18 +743,21 @@ export default function FloatingChat() {
                     className="flex-1 px-3 py-2 sm:px-4 sm:py-3 border border-border rounded-2xl bg-[#ebe6da] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans resize-none text-sm sm:text-base"
                     rows={1}
                     disabled={isLoading}
+                    aria-label="Chat message input"
+                    aria-describedby="chat-input-hint"
                   />
                   <button
                     type="submit"
                     disabled={isLoading || !inputMessage.trim()}
-                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-primary text-primary-foreground rounded-full hover:bg-[#3d6149] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100 disabled:hover:shadow-lg"
+                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-primary text-primary-foreground rounded-full hover:bg-[#3d6149] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100 disabled:hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    aria-label="Send message"
                   >
                     <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
                   </button>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2 font-sans">Press Enter to send, Shift+Enter for new line</p>
+                <p id="chat-input-hint" className="text-xs text-muted-foreground mt-2 font-sans">Press Enter to send, Shift+Enter for new line</p>
               </form>
             </div>
           </motion.div>
@@ -735,6 +782,9 @@ export default function FloatingChat() {
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-labelledby="contact-modal-title"
+            aria-modal="true"
             className="bg-background max-w-lg w-full border border-border shadow-2xl overflow-hidden max-h-[95vh] overflow-y-auto"
           >
             <div className="bg-primary p-5 sm:p-8 text-primary-foreground">
@@ -744,13 +794,14 @@ export default function FloatingChat() {
                     <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <h3 className="font-serif italic text-2xl sm:text-3xl font-light">Get in Touch</h3>
+                    <h3 id="contact-modal-title" className="font-serif italic text-2xl sm:text-3xl font-light">Get in Touch</h3>
                   </div>
                   <p className="text-primary-foreground opacity-85 font-sans text-sm">Send a direct inquiry to Louis</p>
                 </div>
                 <button
                   onClick={() => setShowNotifyModal(false)}
-                  className="text-primary-foreground opacity-70 hover:opacity-100 transition-colors p-1"
+                  className="text-primary-foreground opacity-70 hover:opacity-100 transition-colors p-1 focus:outline-none focus:ring-2 focus:ring-primary-foreground/50 rounded"
+                  aria-label="Close contact form"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -768,10 +819,11 @@ export default function FloatingChat() {
 
               <form onSubmit={handleSendNotification} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2 font-sans">
-                    Email Address <span className="text-destructive">*</span>
+                  <label htmlFor="contact-email" className="block text-sm font-medium text-foreground mb-2 font-sans">
+                    Email Address <span className="text-destructive" aria-label="required">*</span>
                   </label>
                   <input
+                    id="contact-email"
                     type="email"
                     required
                     value={notificationForm.email}
@@ -782,10 +834,11 @@ export default function FloatingChat() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2 font-sans">
+                  <label htmlFor="contact-name" className="block text-sm font-medium text-foreground mb-2 font-sans">
                     Your Name
                   </label>
                   <input
+                    id="contact-name"
                     type="text"
                     value={notificationForm.name}
                     onChange={(e) => setNotificationForm({ ...notificationForm, name: e.target.value })}
@@ -795,10 +848,11 @@ export default function FloatingChat() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2 font-sans">
+                  <label htmlFor="contact-inquiry-type" className="block text-sm font-medium text-foreground mb-2 font-sans">
                     Inquiry Type
                   </label>
                   <select
+                    id="contact-inquiry-type"
                     value={notificationForm.inquiryType}
                     onChange={(e) => setNotificationForm({ ...notificationForm, inquiryType: e.target.value })}
                     className="w-full px-4 py-3 border border-border rounded-[4px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-sans transition-all"
@@ -812,10 +866,11 @@ export default function FloatingChat() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2 font-sans">
-                    Message <span className="text-destructive">*</span>
+                  <label htmlFor="contact-message" className="block text-sm font-medium text-foreground mb-2 font-sans">
+                    Message <span className="text-destructive" aria-label="required">*</span>
                   </label>
                   <textarea
+                    id="contact-message"
                     required
                     value={notificationForm.message}
                     onChange={(e) => setNotificationForm({ ...notificationForm, message: e.target.value })}
