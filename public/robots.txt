@@ -1,0 +1,7 @@
+# Allow all crawlers for public pages
+User-agent: *
+Allow: /
+Disallow: /secret-admin-panel-xyz789/
+
+# Sitemap
+Sitemap: https://louisadriano.com/sitemap.xml
