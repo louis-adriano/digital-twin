@@ -19,10 +19,10 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-[#f5f1e8]">
       {/* Header */}
       <header className="bg-primary border-b border-primary-foreground/20">
-        <div className="max-w-7xl mx-auto px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="font-serif italic text-3xl font-light text-primary-foreground">
+              <h1 className="font-serif italic text-xl sm:text-2xl lg:text-3xl font-light text-primary-foreground">
                 Admin Dashboard
               </h1>
               <p className="text-primary-foreground/80 text-sm mt-1 font-sans">
@@ -31,9 +31,10 @@ export default function AdminDashboard() {
             </div>
             <Link
               href="/"
-              className="bg-primary-foreground text-primary px-6 py-2 rounded-[30px] font-medium text-sm transition-all hover:-translate-y-0.5"
+              className="bg-primary-foreground text-primary px-4 py-1.5 sm:px-6 sm:py-2 rounded-[30px] font-medium text-xs sm:text-sm transition-all hover:-translate-y-0.5"
             >
-              View Site
+              <span className="hidden sm:inline">View Site</span>
+              <span className="sm:hidden">Site</span>
             </Link>
           </div>
         </div>
@@ -41,11 +42,11 @@ export default function AdminDashboard() {
 
       {/* Navigation Tabs */}
       <nav className="bg-[#ebe6da] border-b border-border">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="flex gap-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-4 sm:gap-6 lg:gap-8 overflow-x-auto no-scrollbar">
             <button
               onClick={() => setActiveTab('profile')}
-              className={`py-4 px-2 font-sans text-sm font-medium border-b-2 transition-colors ${
+              className={`py-3 sm:py-4 px-2 font-sans text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === 'profile'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-foreground/60 hover:text-foreground'
@@ -55,7 +56,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => setActiveTab('experiences')}
-              className={`py-4 px-2 font-sans text-sm font-medium border-b-2 transition-colors ${
+              className={`py-3 sm:py-4 px-2 font-sans text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === 'experiences'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-foreground/60 hover:text-foreground'
@@ -65,7 +66,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => setActiveTab('projects')}
-              className={`py-4 px-2 font-sans text-sm font-medium border-b-2 transition-colors ${
+              className={`py-3 sm:py-4 px-2 font-sans text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === 'projects'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-foreground/60 hover:text-foreground'
@@ -75,7 +76,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => setActiveTab('skills')}
-              className={`py-4 px-2 font-sans text-sm font-medium border-b-2 transition-colors ${
+              className={`py-3 sm:py-4 px-2 font-sans text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === 'skills'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-foreground/60 hover:text-foreground'
@@ -85,7 +86,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => setActiveTab('thoughts')}
-              className={`py-4 px-2 font-sans text-sm font-medium border-b-2 transition-colors ${
+              className={`py-3 sm:py-4 px-2 font-sans text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === 'thoughts'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-foreground/60 hover:text-foreground'
@@ -95,7 +96,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => setActiveTab('database')}
-              className={`py-4 px-2 font-sans text-sm font-medium border-b-2 transition-colors ${
+              className={`py-3 sm:py-4 px-2 font-sans text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === 'database'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-foreground/60 hover:text-foreground'
@@ -105,7 +106,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => setActiveTab('embeddings')}
-              className={`py-4 px-2 font-sans text-sm font-medium border-b-2 transition-colors ${
+              className={`py-3 sm:py-4 px-2 font-sans text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === 'embeddings'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-foreground/60 hover:text-foreground'
@@ -118,11 +119,11 @@ export default function AdminDashboard() {
       </nav>
 
       {/* Content Area */}
-      <main className="max-w-7xl mx-auto px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
         {activeTab === 'profile' && (
           <div>
-            <div className="mb-8">
-              <h2 className="font-serif italic text-2xl font-light text-foreground mb-2">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="font-serif italic text-xl sm:text-2xl font-light text-foreground mb-2">
                 Profile Information
               </h2>
               <p className="text-foreground/70 text-sm font-sans">
@@ -135,8 +136,8 @@ export default function AdminDashboard() {
 
         {activeTab === 'experiences' && (
           <div>
-            <div className="mb-8">
-              <h2 className="font-serif italic text-2xl font-light text-foreground mb-2">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="font-serif italic text-xl sm:text-2xl font-light text-foreground mb-2">
                 Work Experience
               </h2>
               <p className="text-foreground/70 text-sm font-sans">
@@ -149,8 +150,8 @@ export default function AdminDashboard() {
 
         {activeTab === 'projects' && (
           <div>
-            <div className="mb-8">
-              <h2 className="font-serif italic text-2xl font-light text-foreground mb-2">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="font-serif italic text-xl sm:text-2xl font-light text-foreground mb-2">
                 Projects
               </h2>
               <p className="text-foreground/70 text-sm font-sans">
@@ -163,8 +164,8 @@ export default function AdminDashboard() {
 
         {activeTab === 'skills' && (
           <div>
-            <div className="mb-8">
-              <h2 className="font-serif italic text-2xl font-light text-foreground mb-2">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="font-serif italic text-xl sm:text-2xl font-light text-foreground mb-2">
                 Skills
               </h2>
               <p className="text-foreground/70 text-sm font-sans">
@@ -177,8 +178,8 @@ export default function AdminDashboard() {
 
         {activeTab === 'thoughts' && (
           <div>
-            <div className="mb-8">
-              <h2 className="font-serif italic text-2xl font-light text-foreground mb-2">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="font-serif italic text-xl sm:text-2xl font-light text-foreground mb-2">
                 Recent Thoughts
               </h2>
               <p className="text-foreground/70 text-sm font-sans">
@@ -191,8 +192,8 @@ export default function AdminDashboard() {
 
         {activeTab === 'database' && (
           <div>
-            <div className="mb-8">
-              <h2 className="font-serif italic text-2xl font-light text-foreground mb-2">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="font-serif italic text-xl sm:text-2xl font-light text-foreground mb-2">
                 Database Management
               </h2>
               <p className="text-foreground/70 text-sm font-sans">
@@ -205,8 +206,8 @@ export default function AdminDashboard() {
 
         {activeTab === 'embeddings' && (
           <div>
-            <div className="mb-8">
-              <h2 className="font-serif italic text-2xl font-light text-foreground mb-2">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="font-serif italic text-xl sm:text-2xl font-light text-foreground mb-2">
                 AI Embeddings
               </h2>
               <p className="text-foreground/70 text-sm font-sans">
@@ -219,9 +220,9 @@ export default function AdminDashboard() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-primary border-t border-primary-foreground/20 mt-16">
-        <div className="max-w-7xl mx-auto px-8 py-6">
-          <p className="text-primary-foreground/70 text-sm text-center font-sans">
+      <footer className="bg-primary border-t border-primary-foreground/20 mt-8 sm:mt-12 lg:mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          <p className="text-primary-foreground/70 text-xs sm:text-sm text-center font-sans">
             Digital Twin Admin Panel • All changes are saved to the database automatically
           </p>
         </div>

@@ -6,6 +6,7 @@ import { Client } from 'pg';
 import FadeIn from '../components/animations/FadeIn';
 import StaggerContainer from '../components/animations/StaggerContainer';
 import StaggerItem from '../components/animations/StaggerItem';
+import MobileBurgerMenu from '../components/MobileBurgerMenu';
 
 // Format date helper
 const formatDate = (dateString: string | null) => {
@@ -132,9 +133,9 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Fixed Navigation */}
-      <nav className="fixed top-0 w-full px-16 py-8 z-50 bg-gradient-to-b from-[#f5f1e8]/98 to-[#f5f1e8]/0">
+      <nav className="fixed top-0 w-full px-6 sm:px-8 lg:px-16 py-5 sm:py-6 lg:py-8 z-50 bg-gradient-to-b from-[#f5f1e8]/98 to-[#f5f1e8]/0">
         <div className="flex justify-between items-center">
-          <Link href="/" className="font-serif text-2xl italic font-light tracking-wide text-foreground">
+          <Link href="/" className="font-serif text-xl sm:text-2xl italic font-light tracking-wide text-foreground">
             {profileData?.profile.name || "Louis Adriano"}
           </Link>
 
@@ -156,14 +157,18 @@ export default async function Home() {
             </li>
           </ul>
 
+          {/* Desktop CV Button */}
           <a
             href="/api/cv/download"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-primary text-primary-foreground px-8 py-3 rounded-[30px] font-medium text-[0.95rem] transition-all hover:bg-[#3d6149] hover:-translate-y-0.5"
+            className="hidden lg:block bg-primary text-primary-foreground px-8 py-3 rounded-[30px] font-medium text-[0.95rem] transition-all hover:bg-[#3d6149] hover:-translate-y-0.5"
           >
             Download CV
           </a>
+
+          {/* Mobile Burger Menu Button */}
+          <MobileBurgerMenu profileName={profileData?.profile.name || "Louis Adriano"} />
         </div>
       </nav>
 
@@ -171,48 +176,48 @@ export default async function Home() {
       <FloatingChat />
 
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center px-16 pt-24 pb-16 bg-[#f5f1e8]">
-        <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 items-center gap-16">
+      <section className="min-h-screen flex items-center justify-center px-6 sm:px-8 lg:px-16 pt-24 sm:pt-28 pb-12 sm:pb-16 bg-[#f5f1e8]">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 items-center gap-12 sm:gap-12 lg:gap-16">
         <FadeIn direction="up" delay={0.2} className="max-w-[600px] mx-auto lg:mx-0 lg:ml-auto">
-          <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-6">
+          <div className="text-xs sm:text-xs uppercase tracking-[2px] sm:tracking-[3px] text-primary font-medium mb-5 sm:mb-6">
             Welcome
           </div>
-          <h1 className="font-serif italic text-[3.2rem] leading-[1.2] font-light text-foreground mb-6">
+          <h1 className="font-serif italic text-[2.2rem] sm:text-[2.5rem] lg:text-[3.2rem] leading-[1.25] font-light text-foreground mb-5 sm:mb-6">
             {profileData?.profile.bio || "Building at the intersection of creativity and technology."}
           </h1>
-          <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 mb-10">
+          <p className="text-[0.95rem] sm:text-base lg:text-[1.05rem] leading-[1.75] sm:leading-[1.8] text-foreground opacity-75 mb-8 sm:mb-10">
             {profileData?.profile.hero_subtitle || `I'm ${profileData?.profile.name || "Louis Adriano"}, a ${profileData?.profile.title || "Full-stack Developer"} passionate about creating meaningful digital experiences.`}
           </p>
-          <div className="flex gap-6">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
             <Link
               href="/portfolio"
-              className="bg-primary text-primary-foreground px-8 py-[0.9rem] rounded-[30px] font-medium text-[0.95rem] transition-all hover:bg-[#3d6149] hover:-translate-y-0.5"
+              className="bg-primary text-primary-foreground px-8 sm:px-8 py-3.5 sm:py-[0.9rem] rounded-[30px] font-medium text-[0.95rem] sm:text-[0.95rem] transition-all hover:bg-[#3d6149] hover:-translate-y-0.5 text-center"
             >
               View my work
             </Link>
             <Link
               href="/contact"
-              className="border-2 border-foreground text-foreground px-8 py-[0.8rem] rounded-[30px] font-medium text-[0.95rem] transition-all hover:bg-foreground hover:text-background hover:-translate-y-0.5"
+              className="border-2 border-foreground text-foreground px-8 sm:px-8 py-[0.8rem] sm:py-[0.8rem] rounded-[30px] font-medium text-[0.95rem] sm:text-[0.95rem] transition-all hover:bg-foreground hover:text-background hover:-translate-y-0.5 text-center"
             >
               Get in touch
             </Link>
           </div>
         </FadeIn>
 
-        <FadeIn direction="right" delay={0.4} className="relative h-[550px] flex items-center justify-center mx-auto lg:mx-0 lg:mr-auto">
-          <div className="relative w-[350px] h-[440px] bg-primary rounded-none shadow-[0_15px_50px_rgba(42,42,42,0.12)] overflow-visible">
+        <FadeIn direction="right" delay={0.4} className="relative h-[400px] sm:h-[500px] lg:h-[550px] flex items-center justify-center mx-auto lg:mx-0 lg:mr-auto">
+          <div className="relative w-[280px] h-[360px] sm:w-[320px] sm:h-[400px] lg:w-[350px] lg:h-[440px] bg-primary rounded-none shadow-[0_15px_50px_rgba(42,42,42,0.12)] overflow-visible">
             <img 
               src="/images/hero.jpg" 
               alt={profileData?.profile.name || "Louis Adriano"}
               className="w-full h-full object-cover"
             />
             {/* Top right decorative rectangle */}
-            <div className="absolute top-8 -right-20 bg-primary px-6 py-2">
-              <span className="text-primary-foreground font-serif italic text-sm font-light tracking-wide">Based in Sydney</span>
+            <div className="absolute top-4 -right-8 sm:top-8 sm:-right-20 bg-primary px-3 py-1 sm:px-6 sm:py-2">
+              <span className="text-primary-foreground font-serif italic text-xs sm:text-sm font-light tracking-wide">Based in Sydney</span>
             </div>
             {/* Bottom left decorative rectangle */}
-            <div className="absolute bottom-8 -left-12 bg-primary px-4 py-2">
-              <span className="text-primary-foreground font-serif italic text-xs font-light tracking-wide">Let&apos;s Connect!</span>
+            <div className="absolute bottom-4 -left-6 sm:bottom-8 sm:-left-12 bg-primary px-3 py-1 sm:px-4 sm:py-2">
+              <span className="text-primary-foreground font-serif italic text-[0.65rem] sm:text-xs font-light tracking-wide">Let&apos;s Connect!</span>
             </div>
           </div>
         </FadeIn>
@@ -220,18 +225,18 @@ export default async function Home() {
       </section>
 
       {/* About Section */}
-      <section className="py-32 px-16 bg-[#ebe6da]">
+      <section className="py-20 sm:py-24 lg:py-32 px-6 sm:px-8 lg:px-16 bg-[#ebe6da]">
         <div className="max-w-[1300px] mx-auto">
           <FadeIn direction="up" className="max-w-[800px] mx-auto text-center">
-            <div className="bg-primary px-16 py-0.5 mb-10 inline-block">
-              <h2 className="font-serif italic text-[2.2rem] font-light text-primary-foreground m-0">
+            <div className="bg-primary px-8 sm:px-12 lg:px-16 py-0.5 mb-6 sm:mb-8 lg:mb-10 inline-block">
+              <h2 className="font-serif italic text-xl sm:text-[1.8rem] lg:text-[2.2rem] font-light text-primary-foreground m-0">
                 About Me
               </h2>
             </div>
-            <p className="text-[1.05rem] leading-[1.9] text-foreground opacity-80 mb-6">
+            <p className="text-[0.95rem] sm:text-base lg:text-[1.05rem] leading-[1.8] sm:leading-[1.8] lg:leading-[1.9] text-foreground opacity-80 mb-5 sm:mb-6">
               {profileData?.profile.about_greeting || "I warmly welcome you to my corner of the internet."}
             </p>
-            <p className="text-[1.05rem] leading-[1.9] text-foreground opacity-80">
+            <p className="text-[0.95rem] sm:text-base lg:text-[1.05rem] leading-[1.8] sm:leading-[1.8] lg:leading-[1.9] text-foreground opacity-80">
               {profileData?.profile.summary || "I'm passionate about technology and spend my days building digital solutions. My journey has taken me through various projects and challenges, shaping how I approach problems and create solutions today."}
             </p>
           </FadeIn>
@@ -239,61 +244,58 @@ export default async function Home() {
       </section>
 
       {/* Expertise Section */}
-      <section className="py-32 px-16 bg-[#f5f1e8]">
+      <section className="py-20 sm:py-24 lg:py-32 px-6 sm:px-8 lg:px-16 bg-[#f5f1e8]">
         <div className="max-w-[1300px] mx-auto">
-          <FadeIn direction="up" className="text-center mb-20">
-            <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-3">
+          <FadeIn direction="up" className="text-center mb-12 sm:mb-16 lg:mb-20">
+            <div className="text-[0.65rem] sm:text-xs uppercase tracking-[2px] sm:tracking-[3px] text-primary font-medium mb-2 sm:mb-3">
               Expertise
             </div>
-            <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
+            <h2 className="font-serif italic text-2xl sm:text-[2rem] lg:text-[2.5rem] font-light text-foreground text-center">
               What I do
             </h2>
           </FadeIn>
 
-          <StaggerContainer className="grid grid-cols-1 lg:grid-cols-3 gap-16 max-w-[1100px] mx-auto">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 sm:gap-12 lg:gap-16 max-w-[1100px] mx-auto">
             {/* Service Cards */}
             <StaggerItem className="transition-all hover:-translate-y-1">
-              <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5">
-                <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-[48px] h-[48px] sm:w-[50px] sm:h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5 sm:mb-5">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                 </svg>
               </div>
-              <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
-                Full-Stack Web Development
+              <h3 className="font-serif italic text-xl sm:text-xl lg:text-[1.3rem] font-light text-foreground mb-3 sm:mb-3">
+                Full-Stack Development
               </h3>
-              <p className="text-foreground opacity-70 leading-[1.7] text-[0.9rem]">
-                Building scalable applications with Next.js, TypeScript, and React. Creating high-performance 
-                platforms with 90+ PageSpeed scores and modern architecture.
+              <p className="text-foreground opacity-70 leading-[1.7] sm:leading-[1.7] text-[0.9rem] sm:text-[0.9rem]">
+                Creating high-performance web applications with Next.js, TypeScript, and React. Delivered corporate websites with 90+ PageSpeed scores and scalable cloud deployments on Vercel and AWS.
               </p>
             </StaggerItem>
 
             <StaggerItem className="transition-all hover:-translate-y-1">
-              <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5">
-                <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-[48px] h-[48px] sm:w-[50px] sm:h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5 sm:mb-5">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
-              <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
-                AI Integration & RAG Architecture
+              <h3 className="font-serif italic text-xl sm:text-xl lg:text-[1.3rem] font-light text-foreground mb-3 sm:mb-3">
+                Business Analysis & Requirements
               </h3>
-              <p className="text-foreground opacity-70 leading-[1.7] text-[0.9rem]">
-                Developing AI-powered systems with RAG architecture and vector databases. 
-                Achieving 90%+ accuracy with semantic search and real-time NLP.
+              <p className="text-foreground opacity-70 leading-[1.7] sm:leading-[1.7] text-[0.9rem] sm:text-[0.9rem]">
+                Translating business needs into technical solutions. Experience gathering stakeholder requirements, creating process documentation, and bridging communication between technical teams and business stakeholders.
               </p>
             </StaggerItem>
 
             <StaggerItem className="transition-all hover:-translate-y-1">
-              <div className="w-[50px] h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5">
-                <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-[48px] h-[48px] sm:w-[50px] sm:h-[50px] bg-primary rounded-[4px] flex items-center justify-center mb-5 sm:mb-5">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
                 </svg>
               </div>
-              <h3 className="font-serif italic text-[1.3rem] font-light text-foreground mb-3">
-                Cloud Deployment & DevOps
+              <h3 className="font-serif italic text-xl sm:text-xl lg:text-[1.3rem] font-light text-foreground mb-3 sm:mb-3">
+                AI Integration & Smart Systems
               </h3>
-              <p className="text-foreground opacity-70 leading-[1.7] text-[0.9rem]">
-                Deploying production applications on Vercel and AWS with automated workflows. 
-                Sub-second response times with seamless scalability.
+              <p className="text-foreground opacity-70 leading-[1.7] sm:leading-[1.7] text-[0.9rem] sm:text-[0.9rem]">
+                Implementing AI-powered search with RAG architecture and vector databases. Building intelligent platforms with semantic search, NLP processing, and real-time query understanding.
               </p>
             </StaggerItem>
           </StaggerContainer>
@@ -301,10 +303,10 @@ export default async function Home() {
       </section>
 
       {/* Featured Projects Section */}
-      <section className="py-32 px-16 bg-[#ebe6da]">
+      <section className="py-20 sm:py-24 lg:py-32 px-6 sm:px-8 lg:px-16 bg-[#ebe6da]">
         <div className="max-w-[1300px] mx-auto">
-          <FadeIn direction="up" className="text-center mb-20">
-            <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-3">
+          <FadeIn direction="up" className="text-center mb-12 sm:mb-16 lg:mb-20">
+            <div className="text-[0.65rem] sm:text-xs uppercase tracking-[2px] sm:tracking-[3px] text-primary font-medium mb-2 sm:mb-3">
               Portfolio
             </div>
             <h2 className="font-serif italic text-[2.5rem] font-light text-foreground">
@@ -324,7 +326,7 @@ export default async function Home() {
             
             return (
               <FadeIn direction="up" delay={0.2}>
-              <div className="max-w-[900px] mx-auto mb-12 p-6 bg-background border-l-4 border-primary">
+              <div className="max-w-[900px] mx-auto mb-8 sm:mb-12 p-4 sm:p-6 bg-background border-l-4 border-primary">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
                   <span className="text-xs uppercase tracking-[2px] text-primary font-medium">Currently Working</span>
@@ -402,9 +404,9 @@ export default async function Home() {
       </section>
 
       {/* Writing/Blog Section */}
-      <section className="py-32 px-16 bg-[#f5f1e8]">
+      <section className="py-20 sm:py-24 lg:py-32 px-6 sm:px-8 lg:px-16 bg-[#f5f1e8]">
         <div className="max-w-[1300px] mx-auto">
-          <FadeIn direction="up" className="text-center mb-20">
+          <FadeIn direction="up" className="text-center mb-12 sm:mb-16 lg:mb-20">
             <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-3">
               Posts
             </div>
@@ -413,7 +415,7 @@ export default async function Home() {
             </h2>
           </FadeIn>
 
-          <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-[1100px] mx-auto">
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 max-w-[1100px] mx-auto">
             {profileData?.thoughts && profileData.thoughts.length > 0 ? (
               profileData.thoughts.map((thought) => (
                 <StaggerItem key={thought.id} className="group transition-all hover:-translate-y-1">
@@ -457,18 +459,18 @@ export default async function Home() {
       </section>
 
       {/* Connect Section */}
-      <section className="py-32 px-16 bg-primary text-center">
+      <section className="py-20 sm:py-24 lg:py-32 px-6 sm:px-8 lg:px-16 bg-primary text-center">
         <FadeIn direction="up" className="max-w-[700px] mx-auto">
-          <h2 className="font-serif italic text-[2.8rem] font-light text-primary-foreground mb-6">
+          <h2 className="font-serif italic text-[2rem] sm:text-[2.2rem] lg:text-[2.8rem] font-light text-primary-foreground mb-5 sm:mb-6">
             Let&apos;s create something together
           </h2>
-          <p className="text-[1.05rem] leading-[1.8] text-primary-foreground opacity-85 mb-10">
+          <p className="text-[0.95rem] sm:text-base lg:text-[1.05rem] leading-[1.75] sm:leading-[1.8] text-primary-foreground opacity-85 mb-8 sm:mb-10">
             I&apos;m always open to interesting conversations, collaborations, and new opportunities.
             Whether you want to discuss a project, ask a question, or just say hello, I&apos;d love to hear from you.
           </p>
           <ConnectButton />
 
-          <div className="flex gap-8 justify-center mt-12">
+          <div className="flex flex-wrap gap-4 sm:gap-8 justify-center mt-8 sm:mt-12">
             {profileData?.profile.linkedin_url && (
               <a
                 href={profileData.profile.linkedin_url}
@@ -502,8 +504,8 @@ export default async function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-16 bg-primary text-center border-t-2 border-primary-foreground/20">
-        <p className="text-primary-foreground opacity-70 text-[0.9rem]">
+      <footer className="py-8 sm:py-12 px-4 sm:px-8 lg:px-16 bg-primary text-center border-t-2 border-primary-foreground/20">
+        <p className="text-primary-foreground opacity-70 text-xs sm:text-sm lg:text-[0.9rem]">
           © 2025{' '}
           <a
             href="https://www.linkedin.com/in/louisadriano/"

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import ContentSections from '../../components/ContentSections';
 import FloatingChat from '../../components/FloatingChat';
 import FadeIn from '../../components/animations/FadeIn';
+import MobileBurgerMenu from '../../components/MobileBurgerMenu';
 
 export default function Portfolio() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
@@ -106,9 +107,9 @@ export default function Portfolio() {
   return (
     <div className="min-h-screen bg-background">
       {/* Fixed Navigation */}
-      <nav className="fixed top-0 w-full px-16 py-8 z-50 bg-gradient-to-b from-[#f5f1e8]/98 to-[#f5f1e8]/0">
+      <nav className="fixed top-0 w-full px-4 sm:px-8 lg:px-16 py-4 sm:py-6 lg:py-8 z-50 bg-gradient-to-b from-[#f5f1e8]/98 to-[#f5f1e8]/0">
         <div className="flex justify-between items-center">
-          <Link href="/" className="font-serif text-2xl italic font-light tracking-wide text-foreground hover:text-primary transition-colors">
+          <Link href="/" className="font-serif text-xl sm:text-2xl italic font-light tracking-wide text-foreground hover:text-primary transition-colors">
             {profileData?.profile.name || "Louis Adriano"}
           </Link>
 
@@ -130,13 +131,40 @@ export default function Portfolio() {
             </li>
           </ul>
 
+          {/* Desktop CV Button */}
           <a
             href="/api/cv/download"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-primary text-primary-foreground px-8 py-3 rounded-[30px] font-medium text-[0.95rem] transition-all hover:bg-[#3d6149] hover:-translate-y-0.5"
+            className="hidden lg:block bg-primary text-primary-foreground px-8 py-3 rounded-[30px] font-medium text-[0.95rem] transition-all hover:bg-[#3d6149] hover:-translate-y-0.5"
           >
             Download CV
+          </a>
+
+          {/* Mobile Burger Menu */}
+          <MobileBurgerMenu profileName={profileData?.profile.name || "Louis Adriano"} />
+        </div>
+      </nav>
+
+      {/* Floating Chat */}
+      <FloatingChat />
+
+      {/* Hero/Header Section */}
+      <section className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 px-4 sm:px-8 lg:px-16 bg-[#f5f1e8]">
+        <div className="max-w-[1400px] mx-auto">
+          <FadeIn direction="up" delay={0.1}>
+            <div className="text-xs sm:text-xs uppercase tracking-[2px] sm:tracking-[3px] text-primary font-medium mb-4 sm:mb-5">
+              Portfolio
+            </div>
+            <h1 className="font-serif italic text-2xl sm:text-[2.5rem] lg:text-[3.5rem] font-light text-foreground mb-3 sm:mb-4">
+              My Journey
+            </h1>
+            <p className="text-foreground opacity-70 text-sm sm:text-base max-w-2xl leading-[1.6] sm:leading-[1.7]">
+              {profileData?.profile.portfolio_summary || "A collection of my experiences, projects, and the skills I've developed along the way."}
+            </p>
+          </FadeIn>
+            <span className="hidden sm:inline">Download CV</span>
+            <span className="sm:hidden">CV</span>
           </a>
         </div>
       </nav>
@@ -145,20 +173,20 @@ export default function Portfolio() {
       <FloatingChat />
 
       {/* Page Header */}
-      <section className="pt-32 pb-16 px-16 bg-[#f5f1e8] relative overflow-hidden">
+      <section className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 px-4 sm:px-8 lg:px-16 bg-[#f5f1e8] relative overflow-hidden">
         <div className="max-w-[1300px] mx-auto text-center relative z-10">
           <FadeIn direction="none" delay={0.1}>
-            <div className="text-xs uppercase tracking-[3px] text-primary font-medium mb-6">
+            <div className="text-[0.65rem] sm:text-xs uppercase tracking-[2px] sm:tracking-[3px] text-primary font-medium mb-4 sm:mb-6">
               Portfolio
             </div>
           </FadeIn>
           <FadeIn direction="up" delay={0.2}>
-            <h1 className="font-serif italic text-[3.5rem] leading-[1.2] font-light text-foreground mb-6">
+            <h1 className="font-serif italic text-2xl sm:text-[2.5rem] lg:text-[3.5rem] leading-[1.2] font-light text-foreground mb-4 sm:mb-6">
               Work & Experience
             </h1>
           </FadeIn>
           <FadeIn direction="up" delay={0.3}>
-            <p className="text-[1.05rem] leading-[1.8] text-foreground opacity-75 max-w-[650px] mx-auto">
+            <p className="text-sm sm:text-base lg:text-[1.05rem] leading-[1.7] sm:leading-[1.8] text-foreground opacity-75 max-w-[650px] mx-auto">
               A comprehensive look at my professional journey, projects, skills, and education.
             </p>
           </FadeIn>
@@ -179,7 +207,7 @@ export default function Portfolio() {
                 sectionRefs.current[section.key] = el;
               }}
               data-section={section.key}
-              className={`py-16 px-16 ${
+              className={`py-12 sm:py-16 px-4 sm:px-8 lg:px-16 ${
                 index % 2 === 0 ? "bg-[#ebe6da]" : "bg-[#f5f1e8]"
               }`}
             >
@@ -197,8 +225,8 @@ export default function Portfolio() {
       </div>
 
       {/* Footer */}
-      <footer className="py-12 px-16 bg-primary text-center border-t-2 border-primary-foreground/20">
-        <p className="text-primary-foreground opacity-70 text-[0.9rem]">
+      <footer className="py-8 sm:py-12 px-4 sm:px-8 lg:px-16 bg-primary text-center border-t-2 border-primary-foreground/20">
+        <p className="text-primary-foreground opacity-70 text-xs sm:text-sm lg:text-[0.9rem]">
           © 2025{' '}
           <a
             href="https://www.linkedin.com/in/louisadriano/"

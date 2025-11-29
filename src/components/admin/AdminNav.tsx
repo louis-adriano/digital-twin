@@ -5,8 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
-  { name: 'Analytics', href: '/admin/analytics', icon: '📈' },
+  { name: 'Dashboard', href: '/secret-admin-panel-xyz789/dashboard', icon: '📊' },
 ];
 
 export default function AdminNav() {
@@ -25,7 +24,7 @@ export default function AdminNav() {
         body: JSON.stringify({ action: 'logout' }),
       });
       
-      router.push('/admin/login');
+      router.push('/secret-admin-panel-xyz789/login');
       router.refresh();
     } catch (error) {
       console.error('Logout error:', error);
@@ -39,7 +38,7 @@ export default function AdminNav() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-8">
-            <Link href="/admin/dashboard" className="flex-shrink-0">
+            <Link href="/secret-admin-panel-xyz789/dashboard" className="flex-shrink-0">
               <h1 className="text-foreground text-lg font-serif font-semibold">
                 Digital Twin Admin
               </h1>

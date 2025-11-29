@@ -48,7 +48,7 @@ export default function AdminLoginPage() {
         throw new Error(result.error || 'Login failed');
       }
 
-      router.push('/admin/dashboard');
+      router.push('/secret-admin-panel-xyz789/dashboard');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');

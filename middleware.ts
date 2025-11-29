@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Check admin authentication for /admin routes (except login)
-  if (request.nextUrl.pathname.startsWith('/admin') && 
-      !request.nextUrl.pathname.startsWith('/admin/login')) {
+  // Check admin authentication for /secret-admin-panel-xyz789 routes (except login)
+  if (request.nextUrl.pathname.startsWith('/secret-admin-panel-xyz789') && 
+      !request.nextUrl.pathname.startsWith('/secret-admin-panel-xyz789/login')) {
     
     const adminSession = request.cookies.get('admin-session');
     
     if (!adminSession) {
-      return NextResponse.redirect(new URL('/admin/login', request.url));
+      return NextResponse.redirect(new URL('/secret-admin-panel-xyz789/login', request.url));
     }
     
     // In a production environment, you would verify the session token here
@@ -19,5 +19,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*']
+  matcher: ['/secret-admin-panel-xyz789/:path*']
 };

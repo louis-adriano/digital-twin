@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function AdminRootPage() {
-  redirect('/admin/dashboard');
+  redirect('/secret-admin-panel-xyz789/dashboard');
 }
